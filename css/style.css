@@ -1,0 +1,1033 @@
+/* main styles for TravelEase */
+
+
+/* css custom properties (design tokens) - Change one value here → entire site updates. This is the single source of truth for colors, spacing, shadows, and radii. */
+
+:root {
+    /* — Colors — */
+    --dark:           #0f172a;
+    --dark-mid:       #1e293b;
+    --green:          #22c55e;
+    --green-hover:    #16a34a;
+    --green-glow:     rgba(34, 197, 94, 0.15);
+    --white:          #ffffff;
+    --page-bg:        #f1f5f9;
+    --card-bg:        #ffffff;
+    --text-on-dark:   #ffffff;
+    --text-on-light:  #0f172a;
+    --text-muted:     #64748b;
+    --text-dim:       rgba(255, 255, 255, 0.55);
+    --border:         #e2e8f0;
+    --border-dark:    rgba(255, 255, 255, 0.1);
+
+    /* — Radii — */
+    --r-sm:   8px;
+    --r-md:   12px;
+    --r-lg:   16px;
+    --r-xl:   20px;
+    --r-pill: 999px;
+
+    /* — Shadows — */
+    --shadow-sm:  0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md:  0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg:  0 10px 40px rgba(0,0,0,0.12);
+    --shadow-xl:  0 20px 60px rgba(0,0,0,0.18);
+
+    /* — Animation — */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* css reset - Strips browser defaults so every element starts from a clean, predictable baseline. */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-on-light);
+    background: var(--page-bg);
+    overflow-x: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+}
+
+ul, ol { list-style: none; }
+img { max-width: 100%; display: block; }
+
+
+/* typography - */ h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; } h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; } h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.35; } p { color: var(--text-muted); line-height: 1.7; } /* Section header pattern used on How It Works, etc. */ .section-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px; color: var(--green); margin-bottom: 8px; display: block; } .section-title { color: var(--text-on-light); margin-bottom: 12px; } .section-subtitle { font-size: 0.95rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 48px; } /* Centered container — max 1100px with padding */ .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; } /* navbar - Fixed at the top. Transparent over the hero image. Becomes solid dark (class "solid") on scroll or on inner pages. Layout:  [Logo]  ——  [Nav Links]  ——  [Sign In Button] ━━━━━━━━━━━━━━━━━━━━ */ .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 16px 0; transition: background 0.4s var(--ease), padding 0.3s var(--ease), box-shadow 0.3s var(--ease); } /* Solid state: dark background, used on scroll or inner pages */ .navbar.solid { background: var(--dark); padding: 10px 0; box-shadow: 0 2px 24px rgba(0,0,0,0.25); } .navbar-inner { max-width: 100%; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; } /* Brand logo */ .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 6px; flex-shrink: 0; } .logo-icon { color: var(--green); font-size: 1.2rem; } /* Navigation links */ .nav-menu { display: flex; gap: 28px; } .nav-menu a { color: rgba(255,255,255,0.65); font-size: 0.85rem; font-weight: 500; transition: color 0.25s; position: relative; } .nav-menu a:hover, .nav-menu a.active { color: var(--white); } /* Underline animation on hover */ .nav-menu a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--green); border-radius: 1px; transition: width 0.3s var(--ease); } .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; } /* Sign In / action button */ .nav-actions { display: flex; align-items: center; gap: 14px; } .btn-nav { padding: 7px 22px; background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.3); border-radius: var(--r-pill); font-size: 0.85rem; font-weight: 600; transition: all 0.3s var(--ease); } .btn-nav:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); } /* "My Bookings" link in nav — appears after login */ .nav-link-bookings { color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 500; transition: color 0.25s; } .nav-link-bookings:hover { color: var(--white); } /* Hamburger (mobile) */ .menu-toggle { display: none; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; } /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5. HERO SECTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Full-viewport section with a scenic bus photo. The dark gradient overlay makes the white text readable. Text is LEFT-ALIGNED to match the reference image. The white search card sits at the BOTTOM of the hero, visually overlapping into the next section below. */
+
+.hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh; /* dynamic viewport height for mobile */
+    display: flex;
+    align-items: center;
+    overflow: visible; /* Changed from hidden so dropdowns can spill out */
+    padding-bottom: 120px; /* room for search card to hang over bottom */
+    z-index: 10; /* Ensure hero content (search card) sits above features strip */
+}
+
+/* Background image with gradient overlay */
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(
+            180deg,
+            rgba(15, 23, 42, 0.75) 0%,
+            rgba(15, 23, 42, 0.4) 35%,
+            rgba(15, 23, 42, 0.55) 65%,
+            rgba(15, 23, 42, 0.8) 100%
+        ),
+        url('/photo-1544620347-c4fd4a3d5957.avif');
+    background-size: cover;
+    background-position: center 40%;
+    z-index: 0;
+}
+
+/* Content container inside the hero */
+.hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+    padding-top: 140px;
+}
+
+/* LEFT-aligned hero text block */
+.hero-text {
+    max-width: 480px;
+    margin-bottom: 48px;
+}
+
+.hero-text h1 {
+    color: var(--white);
+    margin-bottom: 16px;
+}
+
+.hero-text p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    max-width: 380px;
+}
+
+
+/* search card - Dark, semi-transparent card overlaying the hero image. Uses backdrop-filter blur for the glass effect. */
+
+.search-card {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--r-xl);
+    padding: 24px 28px 28px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+/* Transport type tabs: All | Bus | Train */
+.transport-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--r-pill);
+    padding: 4px;
+}
+
+.transport-tabs input[type="radio"] {
+    display: none; /* hidden; the label acts as the clickable element */
+}
+
+.transport-tabs label {
+    flex: 1;
+    text-align: center;
+    padding: 9px 16px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Active tab — green pill with glow */
+.transport-tabs input:checked + label {
+    background: var(--green);
+    color: var(--white);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+
+.transport-tabs label:hover {
+    color: var(--white);
+}
+
+/* Search form: From | To | Date | Search button in a row */
+.search-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+/* Each field in the search form */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* On the dark search card, labels need to be light colored */
+.search-card .form-field label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-field label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+}
+
+.form-field input,
+.form-field select {
+    padding: 11px 14px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text-on-light);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+}
+
+/* Dark inputs inside the search card (hero) */
+.search-card .form-field input,
+.search-card .form-field select {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: var(--white);
+}
+
+.search-card .form-field input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.search-card .form-field input:focus,
+.search-card .form-field select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.form-field input::placeholder {
+    color: #94a3b8;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px var(--green-glow);
+}
+
+/* Modern Custom Date Picker */
+.custom-datepicker {
+    position: relative;
+    width: 100%;
+}
+
+.calendar-input {
+    padding: 11px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--r-sm);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    height: 44px; /* Matches standard input height */
+}
+
+.calendar-input:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.calendar-input.has-value {
+    color: var(--white);
+}
+
+.calendar-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 280px;
+    background: var(--page-bg);
+    border-radius: var(--r-md);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    padding: 16px;
+    z-index: 100;
+    display: none;
+    animation: fadeUp 0.2s ease;
+}
+
+.calendar-dropdown.active {
+    display: block;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.calendar-header button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--text-on-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.calendar-header button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.calendar-month-year {
+    font-weight: 700;
+    color: var(--text-on-light);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    color: var(--text-on-light);
+    transition: all 0.2s;
+}
+
+.calendar-day:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--green);
+}
+
+.calendar-day.disabled {
+    color: var(--border);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.calendar-day.selected {
+    background: var(--green);
+    color: var(--white);
+    font-weight: 700;
+}
+
+.calendar-day.empty {
+    visibility: hidden;
+}
+
+/* Green search button */
+.btn-search {
+    padding: 11px 28px;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    border-radius: var(--r-sm);
+    font-size: 0.92rem;
+    font-weight: 700;
+    transition: all 0.25s var(--ease);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-search:hover {
+    background: var(--green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+}
+
+
+/* features strip - Dark bar directly below the hero showing 4 trust signals. Extra top padding to accommodate the overlapping search card. */
+
+.features-strip {
+    background: var(--dark);
+    padding: 72px 0 48px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    text-align: center;
+}
+
+.feature-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.feature-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--white);
+}
+
+.feature-sub {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: -4px;
+    font-style: italic;
+}
+
+
+/* how it works section - */ .how-it-works { padding: 80px 0; background: var(--card-bg); text-align: center; } .hiw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 8px; } .hiw-card { padding: 36px 24px; border: 1px solid var(--border); border-radius: var(--r-lg); transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease); text-align: center; } .hiw-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); } .hiw-icon { width: 56px; height: 56px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 18px; } /* Each card gets a unique icon background color */ .hiw-card:nth-child(1) .hiw-icon { background: #dcfce7; } .hiw-card:nth-child(2) .hiw-icon { background: #dbeafe; } .hiw-card:nth-child(3) .hiw-icon { background: #fef3c7; } .hiw-card h3 { margin-bottom: 8px; color: var(--text-on-light); } .hiw-card p  { font-size: 0.88rem; } /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9. FOOTER */
+
+.footer {
+    background: var(--dark);
+    padding: 56px 0 0;
+    color: var(--text-dim);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 36px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.footer-brand .nav-logo { margin-bottom: 14px; }
+.footer-brand p {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.85rem;
+    max-width: 260px;
+}
+
+.footer-col h4 {
+    color: var(--white);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 16px;
+}
+
+.footer-col a {
+    display: block;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.85rem;
+    padding: 3px 0;
+    transition: color 0.25s;
+}
+
+.footer-col a:hover { color: var(--green); }
+
+.footer-bottom {
+    padding: 18px 0;
+    text-align: center;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.2);
+}
+
+
+/* auth modal - Full-screen overlay with blurred background. The modal content is a centered white card. Used for Sign In and Sign Up forms. */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border-radius: var(--r-lg);
+    width: 100%;
+    max-width: 420px;
+    padding: 36px;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    animation: modalSlideUp 0.3s var(--ease);
+}
+
+@keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.modal-close:hover { color: var(--text-on-light); }
+
+.modal-title {
+    font-size: 1.4rem;
+    color: var(--text-on-light);
+    margin-bottom: 4px;
+}
+
+.modal-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+/* Auth tab switcher */
+.auth-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.auth-tab {
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 8px 20px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.auth-tab.active { color: var(--green); }
+
+.auth-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--green);
+}
+
+/* Auth forms */
+.auth-form {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-form.active { display: flex; }
+
+.auth-btn {
+    margin-top: 6px;
+    padding: 11px;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    border-radius: var(--r-sm);
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: background 0.25s;
+}
+
+.auth-btn:hover { background: var(--green-hover); }
+
+.auth-error {
+    color: #ef4444;
+    font-size: 0.82rem;
+    background: #fef2f2;
+    padding: 8px 12px;
+    border-radius: var(--r-sm);
+    display: none;
+    border: 1px solid #fecaca;
+}
+
+.auth-success {
+    color: var(--green);
+    font-size: 0.82rem;
+    background: var(--green-glow);
+    padding: 8px 12px;
+    border-radius: var(--r-sm);
+    display: none;
+    border: 1px solid rgba(34,197,94,0.2);
+}
+
+
+/* inner pages (results, seats, bookings) - */ .page-inner { background: var(--page-bg); padding-top: 72px; /* clears the fixed navbar */ min-height: 100vh; } /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12. RESULTS PAGE */
+
+.results-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+
+.results-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.result-count {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Back button — used across inner pages */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    transition: all 0.25s;
+}
+
+.btn-back:hover {
+    background: var(--border);
+    color: var(--text-on-light);
+}
+
+/* Filter tabs on results page (All / Bus / Train) */
+.results-filter {
+    display: inline-flex;
+    gap: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.results-filter input[type="radio"] { display: none; }
+
+.results-filter label {
+    padding: 7px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+}
+
+.results-filter input:checked + label {
+    background: var(--green);
+    color: var(--white);
+}
+
+.results-filter label:hover { color: var(--text-on-light); }
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Empty / loading states */
+.no-results,
+.loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.no-results h3 { font-size: 1.15rem; color: var(--text-on-light); margin-bottom: 6px; }
+
+
+/* route cards - Each card = one travel option on the results page. Layout: [Operator] — [Journey Timeline] — [Price + Book CTA] */
+
+.route-card {
+    display: flex;
+    align-items: center;
+    padding: 22px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.route-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Section 1: Operator info */
+.route-operator { flex: 1; min-width: 0; }
+
+.route-operator h3 {
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 3px;
+}
+
+.route-vehicle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--page-bg);
+    padding: 2px 8px;
+    border-radius: var(--r-pill);
+    display: inline-block;
+}
+
+/* Badge (Bus / Train label) */
+.badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 2px 8px;
+    border-radius: var(--r-pill);
+}
+
+.badge-bus   { background: #dbeafe; color: #1d4ed8; }
+.badge-train { background: #fff7ed; color: #c2410c; }
+
+/* Section 2: Journey timeline */
+.route-journey {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 20px;
+}
+
+.route-point { text-align: center; min-width: 60px; }
+.route-time  { font-size: 1.1rem; font-weight: 700; color: var(--text-on-light); }
+.route-city  { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+
+.route-connector { flex: 1; text-align: center; }
+.route-duration  { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 5px; }
+
+.route-line {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    position: relative;
+}
+
+.route-line::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+}
+
+/* Section 3: Price + Book button */
+.route-action { text-align: right; min-width: 110px; }
+.ticket-price  { font-size: 1.3rem; font-weight: 800; color: var(--green); margin-bottom: 6px; }
+
+.btn-book {
+    padding: 7px 20px;
+    background: var(--dark);
+    color: var(--white);
+    border: none;
+    border-radius: var(--r-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.25s var(--ease);
+}
+
+.btn-book:hover {
+    background: var(--dark-mid);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+
+/* seat selection page - */ .seat-wrapper { max-width: 1000px; margin: 0 auto; padding: 32px 24px 80px; display: flex; gap: 28px; align-items: flex-start; } /* Left panel: trip details */ .seat-info { flex: 1; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 28px; } .seat-info h2 { font-size: 1.2rem; color: var(--text-on-light); margin-bottom: 4px; } .trip-route-bar { display: flex; align-items: center; gap: 14px; padding: 18px; margin: 16px 0; background: var(--page-bg); border-radius: var(--r-md); } .trip-point { flex: 1; } .trip-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 2px; } .trip-city  { font-size: 1rem; font-weight: 700; color: var(--text-on-light); } .trip-time  { font-size: 0.8rem; color: var(--text-muted); } .trip-arrow { font-size: 1.1rem; color: var(--text-muted); } /* Detail rows */ .detail-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; } .dl { color: var(--text-muted); } .dv { font-weight: 600; color: var(--text-on-light); } .detail-row.total { border-bottom: none; padding-top: 12px; font-size: 0.95rem; } .detail-row.total .dv { color: var(--green); font-size: 1.1rem; } /* Seat legend */ .seat-legend { display: flex; gap: 16px; margin: 16px 0; padding: 12px; background: var(--page-bg); border-radius: var(--r-sm); } .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); } .legend-swatch { width: 18px; height: 18px; border-radius: 4px; } .legend-swatch.avail { background: var(--white); border: 2px solid var(--border); } .legend-swatch.sel   { background: var(--green); border: 2px solid var(--green); } .legend-swatch.taken { background: var(--border); border: 2px solid var(--border); } /* Proceed to Pay button */ .btn-proceed { width: 100%; margin-top: 16px; padding: 12px; background: var(--green); color: var(--white); border: none; border-radius: var(--r-md); font-size: 0.95rem; font-weight: 700; transition: all 0.25s var(--ease); } .btn-proceed:hover { background: var(--green-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.3); } .btn-proceed:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; } /* Right panel: seat map */ .seat-map-panel { flex: 1.1; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 28px; } .seat-map-panel h3 { text-align: center; color: var(--text-on-light); margin-bottom: 12px; } .bus-front-indicator { text-align: center; margin-bottom: 20px; font-size: 0.78rem; color: var(--text-muted); background: var(--page-bg); padding: 6px 16px; border-radius: var(--r-pill); display: inline-block; width: 100%; } .seat-grid { display: grid; grid-template-columns: 1fr 1fr 0.5fr 1fr 1fr; gap: 8px; max-width: 280px; margin: 0 auto; } /* Hide the actual checkbox */ .seat-cb { display: none; } .seat { display: flex; align-items: center; justify-content: center; height: 38px; border: 2px solid var(--border); border-radius: 5px; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s var(--ease); background: var(--white); user-select: none; } .seat:hover { border-color: var(--green); color: var(--green); } /* Selected seat (checkbox is checked) */ .seat-cb:checked + .seat { background: var(--green); border-color: var(--green); color: var(--white); } /* Taken / booked seat */ .seat.taken { background: var(--border); border-color: var(--border); color: #b0b8c4; cursor: not-allowed; } .seat.taken:hover { border-color: var(--border); color: #b0b8c4; } .aisle { /* grid spacer for the bus aisle */ } .seat-map-footer { text-align: center; margin-top: 16px; font-size: 0.78rem; color: var(--text-muted); } /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15. BOOKINGS PAGE */
+
+.bookings-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+
+.booking-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 22px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.booking-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.booking-route {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-on-light);
+    margin-bottom: 4px;
+}
+
+.booking-details {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.booking-status {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 6px;
+}
+
+.status-confirmed { background: var(--green-glow); color: var(--green); }
+.status-cancelled { background: #fee2e2; color: #ef4444; }
+
+.booking-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-on-light);
+}
+
+.btn-cancel {
+    margin-top: 8px;
+    padding: 5px 14px;
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+    border-radius: var(--r-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+
+/* animations - */ @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to   { opacity: 1; transform: translateY(0); } } .fade-up { animation: fadeUp 0.65s var(--ease) both; } .fade-up-d1 { animation-delay: 0.05s; } .fade-up-d2 { animation-delay: 0.1s; } .fade-up-d3 { animation-delay: 0.15s; } .fade-up-d4 { animation-delay: 0.2s; } .fade-up-d5 { animation-delay: 0.25s; } .fade-up-d6 { animation-delay: 0.3s; } /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 17. RESPONSIVE DESIGN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Breakpoints: - ≤1024px : Tablet landscape - ≤768px  : Tablet portrait - ≤480px  : Mobile */
+
+/* Tablet Landscape */
+@media (max-width: 1024px) {
+    .hiw-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+    .nav-menu { display: none; }
+    .menu-toggle { display: block; }
+
+    .hero-inner { padding-top: 100px; }
+    .hero { padding-bottom: 100px; }
+
+    .search-card { padding: 20px; }
+    .search-form {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .btn-search {
+        grid-column: 1 / -1;
+        justify-content: center;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .hiw-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .route-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .route-journey { padding: 0; }
+    .route-action {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .seat-wrapper {
+        flex-direction: column;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    body { font-size: 15px; }
+
+    .hero-text h1 { font-size: 2rem; }
+    .hero-text p { font-size: 0.88rem; }
+
+    .search-form {
+        grid-template-columns: 1fr;
+    }
+
+    .transport-tabs label {
+        padding: 8px 10px;
+        font-size: 0.82rem;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .feature-icon { width: 44px; height: 44px; font-size: 1.1rem; }
+    .feature-title { font-size: 0.82rem; }
+
+    .hiw-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .results-wrapper { padding: 24px 16px 60px; }
+
+    .modal-content { padding: 28px; }
+
+    .seat-grid {
+        gap: 6px;
+        max-width: 240px;
+    }
+
+    .seat { height: 34px; font-size: 0.68rem; }
+}

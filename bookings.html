@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelEase — My Bookings</title>
+    <meta name="description" content="View and manage your booked bus and train tickets.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Navbar (solid on inner pages) -->
+    <nav class="navbar solid">
+        <div class="navbar-inner">
+            <a href="index.html" class="nav-logo"><span class="logo-icon">✦</span> TravelEase</a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#how-it-works">How It Works</a></li>
+                <li><a href="index.html#footer">Contact</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+                <div class="nav-actions" id="navActions"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-inner">
+        <div class="bookings-container">
+            <div class="results-topbar">
+                <a href="index.html" class="btn-back">← Home</a>
+                <h2>My Bookings</h2>
+                <span></span>
+            </div>
+            <div id="bookingsList">
+                <div class="loading-state">Loading your bookings...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="nav-logo"><span class="logo-icon">✦</span> TravelEase</div>
+                    <p>Making bus and train travel simple, affordable, and enjoyable.</p>
+                </div>
+                <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div>
+                <div class="footer-col"><h4>Support</h4><a href="#">Help Centre</a><a href="#">Contact Us</a><a href="#">FAQs</a></div>
+                <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Refund Policy</a></div>
+            </div>
+            <div class="footer-bottom">© 2026 TravelEase. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/bookings.js"></script>
+</body>
+</html>
