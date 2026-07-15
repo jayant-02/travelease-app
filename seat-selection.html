@@ -7,15 +7,15 @@
     <meta name="description" content="Choose your preferred seats and book your ticket.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Navbar (solid on inner pages) -->
+    <!-- Navbar (Andar ke pages mein solid rahega) -->
     <nav class="navbar solid">
         <div class="navbar-inner">
-            <a href="index.html" class="nav-logo"><span class="logo-icon">✦</span> TravelEase</a>
+            <a href="index.html" class="nav-logo"><div class="logo-bubble">✦</div> TravelEase</a>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="index.html#how-it-works">How It Works</a></li>
@@ -28,25 +28,24 @@
         </div>
     </nav>
 
-
-    <!-- Main Content -->
+    <!-- Asli Content -->
     <main class="page-inner">
 
-        <!-- Back to Results link -->
+        <!-- Wapas Results par jaane wala link -->
         <div class="container" style="padding-top:24px;">
             <a href="results.html" class="btn-back" id="backBtn">← Back to Results</a>
         </div>
 
-        <!-- Two-column layout: Trip Info (left) + Seat Map (right) -->
+        <!-- 2 Column layout: Left mein Trip details, Right mein Seat Map -->
         <div class="seat-wrapper">
 
-            <!-- Left Column: Trip Details -->
+            <!-- Left Column: Trip ki jaankari -->
             <div class="seat-info">
 
                 <h2 id="opName">Loading...</h2>
                 <span class="badge" id="transportBadge">—</span>
 
-                <!-- Route bar -->
+                <!-- Route bar jisme location, time hoga -->
                 <div class="trip-route-bar">
                     <div class="trip-point">
                         <div class="trip-label">Departure</div>
@@ -61,7 +60,7 @@
                     </div>
                 </div>
 
-                <!-- Detail rows -->
+                <!-- Baaki details: Duration, Price, Vehicle Type -->
                 <div class="detail-row">
                     <span class="dl">Duration</span>
                     <span class="dv" id="detailDuration">—</span>
@@ -82,7 +81,7 @@
                     <div class="legend-item"><div class="legend-swatch taken"></div><span>Taken</span></div>
                 </div>
 
-                <!-- Booking summary -->
+                <!-- Booking ki summary aur total calculation -->
                 <div class="detail-row" style="margin-top:8px;">
                     <span class="dl">Selected Seats</span>
                     <span class="dv" id="selectedSeats">—</span>
@@ -96,13 +95,12 @@
 
             </div>
 
-
-            <!-- Right Column: Seat Map -->
+            <!-- Right Column: Bus ya Train ka Seat Map -->
             <div class="seat-map-panel">
                 <h3>Choose Your Seats</h3>
                 <div class="bus-front-indicator">🚍 Front of Bus</div>
 
-                <!-- 40-seat grid: 10 rows × 4 seats with center aisle -->
+                <!-- 40-seat grid: 10 rows × 4 seats (beech mein rasta) -->
                 <div class="seat-grid">
                     <!-- Row 1 -->
                     <input type="checkbox" id="s1" class="seat-cb"><label for="s1" class="seat">1</label>
@@ -181,12 +179,12 @@
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Niche wala Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="nav-logo"><span class="logo-icon">✦</span> TravelEase</div>
+                    <div class="nav-logo"><div class="logo-bubble">✦</div> TravelEase</div>
                     <p>Making bus and train travel simple, affordable, and enjoyable.</p>
                 </div>
                 <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div>

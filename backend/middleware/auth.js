@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-// NOTE: Hardcoded for demo purposes
+// Token verify karne ke liye secret key
 const JWT_SECRET = 'travelease-super-secret-key-2026';
 
-// Middleware to verify JWT token
+// Ye function route protect karega taaki sirf logged-in user hi access kar sakein
 const protect = (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -11,31 +11,31 @@ const protect = (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(401).json({ message: 'Not authorized to access this route. Please log in.' });
+        return res.status(401).json({ message: 'Aapne login nahi kiya hai (Token missing)' });
     }
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         
-        // Fetch user from DB to attach to request
-        const db = req.app.locals.db;
-        const stmt = db.prepare('SELECT id, username, email, role FROM users WHERE id = ?');
-        stmt.bind([decoded.id]);
+        // JSON DB se user dhoondho taaki aage use ho sake
+        const { getDB } = require('../database/init');
+        const db = getDB();
+        const user = db.users.find(u => u.id === decoded.id);
         
-        if (stmt.step()) {
-            req.user = stmt.getAsObject();
-            stmt.free();
+        if (user) {
+            // Password nikal do security ke liye
+            const { password, ...userWithoutPassword } = user;
+            req.user = userWithoutPassword;
             next();
         } else {
-            stmt.free();
-            return res.status(401).json({ message: 'User belonging to this token no longer exists.' });
+            return res.status(401).json({ message: 'Ye user ab exist nahi karta.' });
         }
     } catch (err) {
-        return res.status(401).json({ message: 'Token is invalid or expired. Please log in again.' });
+        return res.status(403).json({ message: 'Token invalid hai ya expire ho chuka hai. Dubara login karo.' });
     }
 };
 
-// Middleware to restrict access based on roles
+// Roles ke hisaab se access control karne wala middleware
 const authorize = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {

@@ -1,37 +1,35 @@
-node<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TravelEase — Book Bus & Train Tickets Online</title>
-    <meta name="description" content="Compare buses and trains across hundreds of routes. Find the best fares and book your seat in seconds.">
+    <title>TravelEase — Book Bus & Train Tickets</title>
+    <meta name="description" content="Find and book bus and train tickets across India. Compare routes, pick your seat, and travel easy.">
 
-    <!-- Google Fonts — Inter for clean modern typography -->
+    <!-- Fonts — Nunito for the bubbly, friendly feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- NAVBAR -->
+    <!-- Upar wala Navigation Bar -->
     <nav class="navbar" id="navbar">
         <div class="navbar-inner">
 
-            <!-- Brand logo — clicking this always goes home -->
             <a href="index.html" class="nav-logo">
-                <span class="logo-icon">✦</span> TravelEase
+                <div class="logo-bubble">✦</div>
+                TravelEase
             </a>
 
-            <!-- Navigation links -->
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#footer">Contact</a></li>
             </ul>
 
-            <!-- Right side: hamburger (mobile) + sign in -->
             <div style="display:flex; align-items:center; gap:12px;">
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
                 <div class="nav-actions" id="navActions">
@@ -42,61 +40,62 @@ node<!DOCTYPE html>
         </div>
     </nav>
 
-
-    <!-- HERO SECTION -->
+    <!-- Main Hero Section (Search box idhar hi hai) -->
     <section class="hero">
-        <!-- Background image layer -->
-        <div class="hero-bg"></div>
-
         <div class="hero-inner">
 
-            <!-- Left-aligned hero text -->
+            <!-- Bada sa headline -->
             <div class="hero-text fade-up">
-                <h1>Travel made<br>effortless.</h1>
+                <div class="hero-tag">✦ India's Favourite Travel App</div>
+                <h1>Travel made<br><span>effortless.</span></h1>
                 <p>Compare buses and trains across hundreds of routes. Find the best fares and book your seat in seconds.</p>
             </div>
 
-            <!-- ── White Search Card ──
-                 Contains transport tabs and search inputs.
-                 Search only works after signing in. -->
+            <!-- Search wala box -->
             <div class="search-card fade-up fade-up-d2">
 
-                <!-- Transport type selector: All / Bus / Train -->
+                <!-- Transport type chunne ke liye (Bus/Train) -->
                 <div class="transport-tabs" id="transportTabs">
                     <input type="radio" id="tab-all" name="transport" value="" checked>
-                    <label for="tab-all">🚌 All</label>
+                    <label for="tab-all">All </label>
                     <input type="radio" id="tab-bus" name="transport" value="bus">
-                    <label for="tab-bus">🚍 Bus</label>
+                    <label for="tab-bus">Bus</label>
                     <input type="radio" id="tab-train" name="transport" value="train">
-                    <label for="tab-train">🚆 Train</label>
+                    <label for="tab-train">Train</label>
                 </div>
 
-                <!-- Search form -->
+                <!-- Asli search form -->
                 <form class="search-form" id="searchForm" onsubmit="handleSearch(event)">
                     <input type="hidden" name="type" id="transportType" value="">
 
                     <div class="form-field">
                         <label for="origin">From</label>
-                        <input type="text" id="origin" name="origin" placeholder="e.g. Indore" required>
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="origin" name="origin" placeholder="OnBoarding Location" required autocomplete="off">
+                            <div class="autocomplete-list" id="originList"></div>
+                        </div>
                     </div>
 
                     <div class="form-field">
                         <label for="destination">To</label>
-                        <input type="text" id="destination" name="destination" placeholder="e.g. Bhopal" required>
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="destination" name="destination" placeholder="Destination" required autocomplete="off">
+                            <div class="autocomplete-list" id="destList"></div>
+                        </div>
                     </div>
 
                     <div class="form-field">
                         <label>Date</label>
                         <div class="custom-datepicker" id="customDatePicker">
                             <div class="calendar-input" id="cdpInput">
-                                <span id="calendarDateText" style="color: rgba(255,255,255,0.4);">📅 Select Date</span>
+                                <span id="calendarDateText">Pick a date</span>
                                 <input type="hidden" name="date" id="date" required>
                             </div>
                             <div class="calendar-dropdown" id="cdpDropdown">
                                 <div class="calendar-header">
-                                    <button type="button" id="calendarPrev">&lt;</button>
+                                    <button type="button" id="calendarPrev">&#8249;</button>
                                     <div class="calendar-month-year" id="cdpMonthYear"></div>
-                                    <button type="button" id="calendarNext">&gt;</button>
+                                    <button type="button" id="calendarNext">&#8250;</button>
                                 </div>
                                 <div class="calendar-weekdays">
                                     <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
@@ -113,37 +112,35 @@ node<!DOCTYPE html>
         </div>
     </section>
 
-
-    <!-- FEATURES STRIP -->
-    <section class="features-strip">
+    <!-- App ke main features dikhane ke liye strip -->
+    <section class="features-strip" id="features">
         <div class="container">
             <div class="features-grid">
                 <div class="feature-box fade-up fade-up-d1">
-                    <div class="feature-icon">💰</div>
+                    <div class="feature-icon purple">₹</div>
                     <div class="feature-title">Best Prices</div>
-                    <div class="feature-sub">Save more</div>
+                    <div class="feature-sub">Compare fares instantly</div>
                 </div>
                 <div class="feature-box fade-up fade-up-d2">
-                    <div class="feature-icon">🎫</div>
+                    <div class="feature-icon coral">✓</div>
                     <div class="feature-title">Easy Booking</div>
-                    <div class="feature-sub">Book in minutes</div>
+                    <div class="feature-sub">Book in under a minute</div>
                 </div>
                 <div class="feature-box fade-up fade-up-d3">
-                    <div class="feature-icon">🔒</div>
-                    <div class="feature-title">Secure Payments</div>
-                    <div class="feature-sub">100% safe</div>
+                    <div class="feature-icon teal">⊞</div>
+                    <div class="feature-title">Choose Your Seat</div>
+                    <div class="feature-sub">Pick exactly where you sit</div>
                 </div>
                 <div class="feature-box fade-up fade-up-d4">
-                    <div class="feature-icon">💬</div>
+                    <div class="feature-icon yellow">◎</div>
                     <div class="feature-title">24/7 Support</div>
-                    <div class="feature-sub">Always here</div>
+                    <div class="feature-sub">We're always here for you</div>
                 </div>
             </div>
         </div>
     </section>
 
-
-    <!-- HOW IT WORKS -->
+    <!-- App kaise kaam karta hai, uske steps -->
     <section class="how-it-works" id="how-it-works">
         <div class="container">
             <span class="section-label">Simple Process</span>
@@ -152,17 +149,17 @@ node<!DOCTYPE html>
 
             <div class="hiw-grid">
                 <div class="hiw-card fade-up fade-up-d1">
-                    <div class="hiw-icon">🔍</div>
+                    <div class="hiw-icon">⌕</div>
                     <h3>Search Routes</h3>
                     <p>Enter your origin and destination. We show every available bus and train with live pricing.</p>
                 </div>
                 <div class="hiw-card fade-up fade-up-d2">
-                    <div class="hiw-icon">💺</div>
+                    <div class="hiw-icon">⊟</div>
                     <h3>Pick Your Seat</h3>
                     <p>See the seat layout, choose where you want to sit, and know exactly what you'll pay.</p>
                 </div>
                 <div class="hiw-card fade-up fade-up-d3">
-                    <div class="hiw-icon">✅</div>
+                    <div class="hiw-icon">✓</div>
                     <h3>Confirm & Travel</h3>
                     <p>Complete your booking instantly. Get your e-ticket — show it at boarding and you're set.</p>
                 </div>
@@ -170,13 +167,15 @@ node<!DOCTYPE html>
         </div>
     </section>
 
-
-    <!-- FOOTER -->
+    <!-- Niche ka Footer -->
     <footer class="footer" id="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="nav-logo"><span class="logo-icon">✦</span> TravelEase</div>
+                    <div class="nav-logo">
+                        <div class="logo-bubble">✦</div>
+                        TravelEase
+                    </div>
                     <p>Making bus and train travel simple, affordable, and enjoyable for millions of passengers across India.</p>
                 </div>
                 <div class="footer-col">
@@ -202,20 +201,17 @@ node<!DOCTYPE html>
         </div>
     </footer>
 
-
-    <!-- JAVASCRIPT -->
     <script src="js/main.js"></script>
     <script src="js/datepicker.js"></script>
     <script>
-        // ── 1. Navbar scroll effect: transparent → solid ──
+        // Scroll karne par navbar solid ho jayega
         window.addEventListener('scroll', function () {
             document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
         });
 
-        // ── 2. Mobile hamburger menu toggle ──
+        // Phone pe menu kholne ke liye hamburger toggle
         document.getElementById('menuToggle').addEventListener('click', function () {
             const menu = document.getElementById('navMenu');
-            // Toggle visibility on mobile
             if (menu.style.display === 'flex') {
                 menu.style.display = 'none';
             } else {
@@ -225,38 +221,21 @@ node<!DOCTYPE html>
                 menu.style.top = '100%';
                 menu.style.left = '0';
                 menu.style.right = '0';
-                menu.style.background = 'var(--dark)';
-                menu.style.padding = '16px 24px';
+                menu.style.background = 'white';
+                menu.style.padding = '16px 32px';
                 menu.style.gap = '12px';
+                menu.style.boxShadow = '0 8px 24px rgba(108,99,255,0.15)';
             }
         });
 
-        // ── 3. Transport tab → hidden field sync ──
+        // Radio buttons ko hidden input ke saath sync rakho
         document.querySelectorAll('#transportTabs input[type="radio"]').forEach(function (radio) {
             radio.addEventListener('change', function () {
                 document.getElementById('transportType').value = this.value;
             });
         });
 
-        // ── 4. Date input: modern placeholder behavior ──
-        // The "date-placeholder" span covers the default dd-mm-yyyy text.
-        // Once a date is picked, we hide the placeholder and show the real date.
-        const dateInput = document.getElementById('date');
-        if (dateInput) {
-            // Don't allow past dates
-            dateInput.min = new Date().toISOString().split('T')[0];
-
-            dateInput.addEventListener('change', function () {
-                if (this.value) {
-                    this.classList.add('has-value');
-                } else {
-                    this.classList.remove('has-value');
-                }
-            });
-        }
-
-        // ── 5. Search form handler ──
-        // If user is NOT signed in, block the search and show the auth modal.
+        // Form submit hone pe kya karna hai — bina login ke search nahi karne dega
         function handleSearch(event) {
             event.preventDefault();
 
@@ -265,13 +244,11 @@ node<!DOCTYPE html>
                 return;
             }
 
-            // Build the URL with query params and redirect to results page
             const origin = document.getElementById('origin').value.trim();
             const destination = document.getElementById('destination').value.trim();
             const date = document.getElementById('date').value;
             const type = document.getElementById('transportType').value;
 
-            // Remember these for the back button on results page
             localStorage.setItem('last_origin', origin);
             localStorage.setItem('last_dest', destination);
 
@@ -280,6 +257,53 @@ node<!DOCTYPE html>
 
             window.location.href = url;
         }
+
+        // City auto-predict / autocomplete ka logic
+        const cities = ["Indore", "Bhopal", "Delhi", "Jaipur", "Mumbai", "Pune", "Bangalore", "Mysore", "Hyderabad", "Chennai", "Ahmedabad", "Surat"].sort();
+        
+        function setupAutocomplete(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+
+            input.addEventListener('input', function() {
+                const val = this.value.trim();
+                list.innerHTML = '';
+                if (!val) {
+                    list.classList.remove('open');
+                    return;
+                }
+                
+                const matches = cities.filter(c => c.toLowerCase().includes(val.toLowerCase()));
+                if (matches.length === 0) {
+                    list.classList.remove('open');
+                    return;
+                }
+
+                matches.forEach(match => {
+                    const div = document.createElement('div');
+                    // Matching city ka naam highlight karne ke liye
+                    const regex = new RegExp(`(${val})`, "gi");
+                    div.innerHTML = match.replace(regex, "<strong>$1</strong>");
+                    div.addEventListener('click', function() {
+                        input.value = match;
+                        list.classList.remove('open');
+                    });
+                    list.appendChild(div);
+                });
+                list.classList.add('open');
+            });
+
+            // Jab bahar click ho toh dropdown band kardo
+            document.addEventListener('click', function (e) {
+                if (e.target !== input) {
+                    list.classList.remove('open');
+                }
+            });
+        }
+
+        setupAutocomplete('origin', 'originList');
+        setupAutocomplete('destination', 'destList');
+
     </script>
 
 </body>

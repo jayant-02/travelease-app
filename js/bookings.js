@@ -1,45 +1,52 @@
 /*
   bookings.js — My Bookings Page Logic
   Fetches the logged-in user's booking history from the API
-  and renders booking cards. Also handles ticket cancellation.
+  User ki booking history API se fetch karta hai aur cards render karta hai. Ticket cancellation bhi yahi handle hota hai.
 */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Wait a moment for main.js to initialize auth
+    // Thoda wait karo jab tak main.js auth initialize ho jaye
     setTimeout(() => {
-        if (!getToken()) {
-            // Not logged in — redirect to home
+        const token = getToken();
+
+        // Agar token nahi hai, toh page access nahi karne do
+        if (!token) {
             window.location.href = 'index.html';
             return;
         }
-        fetchBookings();
+
+        // Backend se bookings laao
+        fetchBookings(token);
     }, 150);
 });
 
-
 // Fetch user's bookings from API
-async function fetchBookings() {
+async function fetchBookings(token) {
     const listEl = document.getElementById('bookingsList');
+    // Load dikhao
+    listEl.innerHTML = '<div class="loading-state">Aapki bookings nikal rahe hain...</div>';
 
     try {
         const res = await fetch(`${API_BASE}/bookings/my`, {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
 
-        if (data.count === 0) {
+        // Agar koi booking nahi hai
+        if (!data || data.count === 0) {
             listEl.innerHTML = `
                 <div class="no-results">
-                    <h3>No Bookings Yet</h3>
-                    <p>You haven't booked any tickets yet. Go explore some routes!</p>
-                    <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Search Routes</a>
+                    <h3>Abhi tak koi bookings nahi!</h3>
+                    <p>Lagta hai aapne abhi tak koi ticket book nahi kiya hai. Kuch explore karein!</p>
+                    <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Abhi Book Karein</a>
                 </div>
             `;
             return;
         }
 
+        // List saaf karo aur cards render karo
         let html = '';
         data.bookings.forEach(booking => {
             const isConfirmed = booking.status === 'confirmed';
@@ -50,9 +57,9 @@ async function fetchBookings() {
                 <div>
                     <div class="booking-route">${booking.origin} → ${booking.destination}</div>
                     <div class="booking-details">
-                        ${booking.operator_name} · ${booking.vehicle_type}<br>
-                        📅 ${booking.travel_date} · ${booking.departure_time} → ${booking.arrival_time}<br>
-                        🪑 ${booking.seats} seat(s) · ${booking.duration}
+                    ${booking.operator_name || 'Unknown Operator'} · ${booking.vehicle_type || ''}<br>
+                        Date: ${booking.travel_date} · ${booking.departure_time || ''} → ${booking.arrival_time || ''}<br>
+                        Seats: ${booking.seats} · ${booking.duration || ''}
                     </div>
                     <span class="booking-status ${statusClass}">${booking.status}</span>
                 </div>
@@ -67,31 +74,37 @@ async function fetchBookings() {
         listEl.innerHTML = html;
 
     } catch (err) {
+        // Agar error aaye
         listEl.innerHTML = `
-            <div class="no-results">
-                <h3 style="color:#ef4444;">Error</h3>
-                <p>${err.message}</p>
+            <div class="no-results" style="color:var(--coral);">
+                <h3>Arey yaar!</h3>
+                <p>Bookings load nahi ho paayin. Connection check karo: ${err.message}</p>
             </div>
         `;
     }
 }
 
-
-// Cancel a booking
+// Ticket cancel karne ka function
 async function cancelBooking(id) {
-    if (!confirm('Are you sure you want to cancel this booking?')) return;
+    if (!confirm('Kya aap waqai apni ticket cancel karna chahte hain?')) return;
+
+    const token = getToken();
 
     try {
+        // Cancel API pe call karo
         const res = await fetch(`${API_BASE}/bookings/${id}/cancel`, {
             method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
 
-        alert(data.message);
-        fetchBookings(); // Refresh the list
+        // Cancel ho gaya
+        alert('Booking cancel ho gayi! Refund jaldi hi process ho jayega.');
+        
+        // Nayi list manga lo
+        fetchBookings(token); 
 
     } catch (err) {
         alert('Failed to cancel: ' + err.message);

@@ -11,15 +11,15 @@
   7. If user is not logged in, show auth modal first
 */
 
-let currentRoute = null;
+// URL se details nikalo
+const urlParams = new URLSearchParams(window.location.search);
+const routeId = urlParams.get('routeId');
+const travelDate = urlParams.get('date');
+
+let routeData = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const routeId = params.get('routeId');
-    const date = params.get('date');
-
-    // Validate we have the needed params
-    if (!routeId || !date) {
+    if (!routeId) {
         document.querySelector('.seat-wrapper').innerHTML = `
             <div class="no-results" style="width:100%; text-align:center;">
                 <h3>Missing Information</h3>
@@ -29,51 +29,37 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         return;
     }
-
-    // Set the "Back to Results" link
-    const backBtn = document.getElementById('backBtn');
-    const lastOrigin = localStorage.getItem('last_origin') || '';
-    const lastDest = localStorage.getItem('last_dest') || '';
-    if (backBtn) {
-        backBtn.href = `results.html?origin=${encodeURIComponent(lastOrigin)}&destination=${encodeURIComponent(lastDest)}&date=${date}`;
-    }
-
-    // Fetch route details and set up seat selection
-    fetchRouteDetails(routeId);
-    setupSeatListeners();
+    fetchRouteDetails();
 });
 
-
-// Fetch route details from backend
-async function fetchRouteDetails(routeId) {
+// Backend se is route ki detail le aao
+async function fetchRouteDetails() {
     try {
         const res = await fetch(`${API_BASE}/routes/${routeId}`);
-        const route = await res.json();
-
-        if (!res.ok) throw new Error(route.message);
-
-        currentRoute = route;
-
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        
+        routeData = data;
+        
         // Populate the left panel with route details
-        document.getElementById('opName').textContent = route.operator_name;
+        document.getElementById('opName').textContent = routeData.operator_name;
 
         const badge = document.getElementById('transportBadge');
-        badge.textContent = route.transport_type.charAt(0).toUpperCase() + route.transport_type.slice(1);
-        badge.className = `badge ${route.transport_type === 'bus' ? 'badge-bus' : 'badge-train'}`;
+        badge.textContent = routeData.transport_type.charAt(0).toUpperCase() + routeData.transport_type.slice(1);
+        badge.className = `badge ${routeData.transport_type === 'bus' ? 'badge-bus' : 'badge-train'}`;
 
-        document.getElementById('tripOrigin').textContent = route.origin;
-        document.getElementById('tripDest').textContent = route.destination;
-        document.getElementById('tripDepTime').textContent = route.departure_time;
-        document.getElementById('tripArrTime').textContent = route.arrival_time;
+        document.getElementById('tripOrigin').textContent = routeData.origin;
+        document.getElementById('tripDest').textContent = routeData.destination;
+        document.getElementById('tripDepTime').textContent = routeData.departure_time;
+        document.getElementById('tripArrTime').textContent = routeData.arrival_time;
 
-        document.getElementById('detailDuration').textContent = route.duration;
-        document.getElementById('detailPrice').textContent = `₹${route.price}`;
-        document.getElementById('detailVehicle').textContent = route.vehicle_type;
+        document.getElementById('detailDuration').textContent = routeData.duration;
+        document.getElementById('detailPrice').textContent = `₹${routeData.price}`;
+        document.getElementById('detailVehicle').textContent = routeData.vehicle_type;
 
         // Simulate some seats being already taken
-        // We use a simple hash based on route ID so it's consistent per route
         markTakenSeats(parseInt(routeId));
-
+        attachSeatListeners();
     } catch (err) {
         document.querySelector('.seat-wrapper').innerHTML = `
             <div class="no-results" style="width:100%; text-align:center;">
@@ -83,7 +69,6 @@ async function fetchRouteDetails(routeId) {
         `;
     }
 }
-
 
 // Mark some seats as "taken" based on route ID
 function markTakenSeats(routeId) {
@@ -97,48 +82,41 @@ function markTakenSeats(routeId) {
     });
 }
 
-
-// Set up seat click listeners
-function setupSeatListeners() {
+// Seat select/deselect par summary update karo
+function attachSeatListeners() {
     const checkboxes = document.querySelectorAll('.seat-cb');
-    const selectedEl = document.getElementById('selectedSeats');
-    const totalEl = document.getElementById('totalPrice');
-
     checkboxes.forEach(cb => {
-        cb.addEventListener('change', () => {
-            const count = document.querySelectorAll('.seat-cb:checked:not(:disabled)').length;
-
-            if (count > 0 && currentRoute) {
-                selectedEl.textContent = count;
-                totalEl.textContent = `₹${count * currentRoute.price}`;
-            } else {
-                selectedEl.textContent = '—';
-                totalEl.textContent = '₹0';
-            }
-        });
+        cb.addEventListener('change', updateSummary);
     });
 }
 
-
-// Proceed to Pay
-function handleProceed() {
+function updateSummary() {
     const selected = document.querySelectorAll('.seat-cb:checked:not(:disabled)');
+    const count = selected.length;
+    const total = count * routeData.price;
+    
+    document.getElementById('selectedSeats').textContent = count > 0 ? count : '—';
+    document.getElementById('totalPrice').textContent = `₹${total}`;
+    
+    const proceedBtn = document.getElementById('proceedBtn');
+    if (proceedBtn) proceedBtn.disabled = count === 0;
+}
 
-    if (selected.length === 0) {
-        alert('Please select at least one seat.');
-        return;
-    }
-
-    // If not logged in, show auth modal and retry after login
+// Jab user Confirm Booking dabaye
+document.getElementById('proceedBtn').addEventListener('click', () => {
+    const selected = document.querySelectorAll('.seat-cb:checked:not(:disabled)');
+    
+    // Login nahi kiya hai toh modal kholo aur process rok do
     if (!getToken()) {
         openAuthModal();
         return;
     }
 
+    // Login hai toh aage badho
     processBooking(selected.length);
-}
+});
 
-// This callback is called by main.js after successful login
+// Login success hone pe apne aap booking start kardo
 window.onAuthSuccess = function () {
     const selected = document.querySelectorAll('.seat-cb:checked:not(:disabled)');
     if (selected.length > 0) {
@@ -146,39 +124,37 @@ window.onAuthSuccess = function () {
     }
 };
 
-
-// Call the booking API
+// Booking request bhejo
 async function processBooking(seatCount) {
     const btn = document.getElementById('proceedBtn');
     const originalText = btn.textContent;
-    btn.textContent = 'Booking...';
+    btn.textContent = 'Processing...';
     btn.disabled = true;
 
-    const params = new URLSearchParams(window.location.search);
-    const travelDate = params.get('date');
-
     try {
+        const payload = {
+            route_id: routeData.id,
+            travel_date: travelDate,
+            seats: seatCount
+        };
+
         const res = await fetch(`${API_BASE}/bookings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${getToken()}`
             },
-            body: JSON.stringify({
-                route_id: currentRoute.id,
-                travel_date: travelDate,
-                seats: seatCount
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message);
 
-        // Booking successful — redirect to bookings page
+        // Booking successful! My Bookings page pe le jao
         alert('🎉 ' + data.message);
         window.location.href = 'bookings.html';
-
+        
     } catch (err) {
         alert('Booking failed: ' + err.message);
         btn.textContent = originalText;

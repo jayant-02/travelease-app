@@ -1,5 +1,5 @@
 /*
-  datepicker.js — Custom Modern Date Picker Logic
+  datepicker.js — Apna custom Date Picker (Calender) logic
 */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateText = document.getElementById('calendarDateText');
     const hiddenInput = document.getElementById('date');
 
-    if (!inputContainer) return; // Only run on pages with the date picker
+    if (!inputContainer) return; // Sirf tab chalega jab page pe datepicker hoga
 
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
@@ -24,20 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    // Toggle dropdown
+    // Dropdown ko kholne/band karne ke liye
     inputContainer.addEventListener('click', (e) => {
-        dropdown.classList.toggle('active');
+        dropdown.classList.toggle('open');
         e.stopPropagation();
     });
 
-    // Close on outside click
+    // Jab bahar click ho toh dropdown band kardo
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.custom-datepicker')) {
-            dropdown.classList.remove('active');
+            dropdown.classList.remove('open');
         }
     });
 
-    // Prev/Next month
+    // Pichla mahina (Prev) aur agla mahina (Next)
     prevBtn.addEventListener('click', () => {
         currentMonth--;
         if (currentMonth < 0) { currentMonth = 11; currentYear--; }
@@ -57,25 +57,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDay = new Date(currentYear, currentMonth, 1).getDay();
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-        // Empty slots before first day
+        // Mahine ke start date se pehle ke khali dabbe
         for (let i = 0; i < firstDay; i++) {
             const empty = document.createElement('div');
             empty.className = 'calendar-day empty';
             daysContainer.appendChild(empty);
         }
 
-        // Days of the month
+        // Mahine ke asli din
         for (let i = 1; i <= daysInMonth; i++) {
             const dateObj = new Date(currentYear, currentMonth, i);
             const dayEl = document.createElement('div');
             dayEl.className = 'calendar-day';
             dayEl.textContent = i;
 
-            // Check if past date
+            // Agar purani date hai toh disable kardo (grey)
             if (dateObj < today) {
                 dayEl.classList.add('disabled');
             } else {
-                // Check if selected
+                // Agar already selected hai toh highlight karo
                 if (selectedDate && 
                     selectedDate.getDate() === i && 
                     selectedDate.getMonth() === currentMonth && 
@@ -83,11 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     dayEl.classList.add('selected');
                 }
 
-                // Click event
+                // Din par click karne ka event
                 dayEl.addEventListener('click', () => {
                     selectedDate = new Date(currentYear, currentMonth, i);
                     
-                    // Format as YYYY-MM-DD for hidden input
+                    // Form mein bhejne ke liye YYYY-MM-DD format banao
                     const y = selectedDate.getFullYear();
                     const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
                     const d = String(selectedDate.getDate()).padStart(2, '0');
@@ -95,13 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     hiddenInput.value = formattedValue;
                     
-                    // Format for display (e.g. 15 Jul 2026)
+                    // Screen pe dikhane ke liye format (jaise 15 Jul 2026)
                     const displayFormat = `${d} ${monthNames[selectedDate.getMonth()].substring(0,3)} ${y}`;
                     dateText.innerHTML = `📅 ${displayFormat}`;
                     inputContainer.classList.add('has-value');
 
-                    dropdown.classList.remove('active');
-                    renderCalendar(); // Re-render to show selected state
+                    dropdown.classList.remove('open');
+                    renderCalendar(); // Nayi selected date dikhane ke liye dobara render karo
                 });
             }
 

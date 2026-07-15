@@ -7,15 +7,18 @@
     <meta name="description" content="Bus and train routes with fares, timings, and operators.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Navbar (solid on inner pages) -->
+    <!-- Navbar hamesha dikhne wala (andar ke pages par) -->
     <nav class="navbar solid">
         <div class="navbar-inner">
-            <a href="index.html" class="nav-logo"><span class="logo-icon">✦</span> TravelEase</a>
+            <a href="index.html" class="nav-logo">
+                <div class="logo-bubble">✦</div>
+                TravelEase
+            </a>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="index.html#how-it-works">How It Works</a></li>
@@ -28,41 +31,41 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Asli Results wala content -->
     <main class="page-inner">
         <div class="results-wrapper">
 
-            <!-- Top bar: Back button, Route heading, Result count -->
+            <!-- Upar ki patti: Back button, Route naam, aur total count -->
             <div class="results-topbar">
                 <a href="index.html" class="btn-back">← Back</a>
                 <h2 id="routeTitle">Searching...</h2>
-                <span class="result-count" id="resultCount">Loading...</span>
+                <span class="result-count" id="resultCount">Loading</span>
             </div>
 
-            <!-- Filter tabs: All / Bus / Train -->
+            <!-- Bus/Train ke filter tabs -->
             <div class="results-filter">
                 <input type="radio" id="filter-all" name="filter" value="" checked>
                 <label for="filter-all">All</label>
                 <input type="radio" id="filter-bus" name="filter" value="bus">
-                <label for="filter-bus">🚍 Bus</label>
+                <label for="filter-bus">Bus</label>
                 <input type="radio" id="filter-train" name="filter" value="train">
-                <label for="filter-train">🚆 Train</label>
+                <label for="filter-train">Train</label>
             </div>
 
-            <!-- Route cards are injected here by results.js -->
+            <!-- Route cards yahan aayenge -->
             <div class="results-list" id="resultsContainer">
-                <div class="loading-state">🔍 Searching for the best routes...</div>
+                <div class="loading-state">Searching for the best routes...</div>
             </div>
 
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Niche wala Footer -->
     <footer class="footer" id="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="nav-logo"><span class="logo-icon">✦</span> TravelEase</div>
+                    <div class="nav-logo"><div class="logo-bubble">✦</div> TravelEase</div>
                     <p>Making bus and train travel simple, affordable, and enjoyable.</p>
                 </div>
                 <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div>

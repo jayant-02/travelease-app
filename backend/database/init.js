@@ -1,108 +1,69 @@
 const fs = require('fs');
 const path = require('path');
-const initSqlJs = require('sql.js');
 
-const DB_PATH = path.join(__dirname, '../../travelease.db');
+const DB_PATH = path.join(__dirname, '../../database.json');
 
-async function initDatabase() {
-    console.log('🗄️  Initializing database...');
-    const SQL = await initSqlJs();
-    let db;
+// Ye default routes hain jo app chalate hi DB mein chale jayenge
+const sampleRoutes = [
+    { id: 1, operator_name: 'Chartered Bus', transport_type: 'bus', vehicle_type: 'A/C Sleeper', origin: 'Indore', destination: 'Bhopal', departure_time: '10:00 AM', arrival_time: '02:00 PM', duration: '4 hrs', price: 500, available_seats: 36, created_at: new Date().toISOString() },
+    { id: 2, operator_name: 'Hans Travels', transport_type: 'bus', vehicle_type: 'Non A/C Seater', origin: 'Indore', destination: 'Bhopal', departure_time: '01:30 PM', arrival_time: '06:00 PM', duration: '4.5 hrs', price: 400, available_seats: 45, created_at: new Date().toISOString() },
+    { id: 3, operator_name: 'Intercity Express', transport_type: 'bus', vehicle_type: 'Premium Volvo', origin: 'Indore', destination: 'Bhopal', departure_time: '05:00 PM', arrival_time: '08:30 PM', duration: '3.5 hrs', price: 750, available_seats: 32, created_at: new Date().toISOString() },
+    { id: 4, operator_name: 'Shatabdi Express', transport_type: 'train', vehicle_type: 'AC Chair Car', origin: 'Indore', destination: 'Bhopal', departure_time: '06:15 AM', arrival_time: '09:15 AM', duration: '3 hrs', price: 350, available_seats: 120, created_at: new Date().toISOString() },
+    { id: 5, operator_name: 'Narmada Express', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Indore', destination: 'Bhopal', departure_time: '02:00 PM', arrival_time: '07:00 PM', duration: '5 hrs', price: 220, available_seats: 200, created_at: new Date().toISOString() },
+    { id: 6, operator_name: 'Malwa Express', transport_type: 'train', vehicle_type: 'AC 3-Tier', origin: 'Indore', destination: 'Bhopal', departure_time: '11:00 PM', arrival_time: '04:30 AM', duration: '5.5 hrs', price: 480, available_seats: 72, created_at: new Date().toISOString() },
+    { id: 7, operator_name: 'RSRTC Volvo', transport_type: 'bus', vehicle_type: 'A/C Seater', origin: 'Delhi', destination: 'Jaipur', departure_time: '08:00 AM', arrival_time: '01:00 PM', duration: '5 hrs', price: 450, available_seats: 40, created_at: new Date().toISOString() },
+    { id: 8, operator_name: 'Pink City Express', transport_type: 'bus', vehicle_type: 'Sleeper Coach', origin: 'Delhi', destination: 'Jaipur', departure_time: '10:30 PM', arrival_time: '03:30 AM', duration: '5 hrs', price: 600, available_seats: 36, created_at: new Date().toISOString() },
+    { id: 9, operator_name: 'Double Decker', transport_type: 'train', vehicle_type: 'AC Chair Car', origin: 'Delhi', destination: 'Jaipur', departure_time: '05:35 PM', arrival_time: '10:05 PM', duration: '4.5 hrs', price: 500, available_seats: 150, created_at: new Date().toISOString() },
+    { id: 10, operator_name: 'Ajmer Shatabdi', transport_type: 'train', vehicle_type: 'Executive Chair', origin: 'Delhi', destination: 'Jaipur', departure_time: '06:05 AM', arrival_time: '10:40 AM', duration: '4.5 hrs', price: 850, available_seats: 56, created_at: new Date().toISOString() },
+    { id: 11, operator_name: 'Neeta Travels', transport_type: 'bus', vehicle_type: 'A/C Sleeper', origin: 'Mumbai', destination: 'Pune', departure_time: '07:00 AM', arrival_time: '10:30 AM', duration: '3.5 hrs', price: 350, available_seats: 30, created_at: new Date().toISOString() },
+    { id: 12, operator_name: 'Orange Travels', transport_type: 'bus', vehicle_type: 'Semi-Sleeper', origin: 'Mumbai', destination: 'Pune', departure_time: '11:00 PM', arrival_time: '02:30 AM', duration: '3.5 hrs', price: 300, available_seats: 40, created_at: new Date().toISOString() },
+    { id: 13, operator_name: 'Deccan Queen', transport_type: 'train', vehicle_type: 'AC Chair Car', origin: 'Mumbai', destination: 'Pune', departure_time: '05:10 PM', arrival_time: '08:25 PM', duration: '3.2 hrs', price: 400, available_seats: 120, created_at: new Date().toISOString() },
+    { id: 14, operator_name: 'Pragati Express', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Mumbai', destination: 'Pune', departure_time: '06:05 AM', arrival_time: '09:05 AM', duration: '3 hrs', price: 180, available_seats: 200, created_at: new Date().toISOString() },
+    { id: 15, operator_name: 'KSRTC Airavat', transport_type: 'bus', vehicle_type: 'A/C Seater', origin: 'Bangalore', destination: 'Mysore', departure_time: '08:30 AM', arrival_time: '11:30 AM', duration: '3 hrs', price: 250, available_seats: 52, created_at: new Date().toISOString() },
+    { id: 16, operator_name: 'SRS Travels', transport_type: 'bus', vehicle_type: 'Non A/C Seater', origin: 'Bangalore', destination: 'Mysore', departure_time: '06:00 PM', arrival_time: '09:00 PM', duration: '3 hrs', price: 180, available_seats: 45, created_at: new Date().toISOString() },
+    { id: 17, operator_name: 'Shatabdi Express', transport_type: 'train', vehicle_type: 'AC Chair Car', origin: 'Bangalore', destination: 'Mysore', departure_time: '11:00 AM', arrival_time: '01:35 PM', duration: '2.5 hrs', price: 310, available_seats: 100, created_at: new Date().toISOString() },
+    { id: 18, operator_name: 'Chamundi Express', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Bangalore', destination: 'Mysore', departure_time: '06:10 PM', arrival_time: '09:05 PM', duration: '3 hrs', price: 160, available_seats: 180, created_at: new Date().toISOString() },
+    { id: 19, operator_name: 'Parveen Travels', transport_type: 'bus', vehicle_type: 'Volvo A/C', origin: 'Hyderabad', destination: 'Chennai', departure_time: '07:00 PM', arrival_time: '06:00 AM', duration: '11 hrs', price: 850, available_seats: 36, created_at: new Date().toISOString() },
+    { id: 20, operator_name: 'SRS Travels', transport_type: 'bus', vehicle_type: 'Sleeper', origin: 'Hyderabad', destination: 'Chennai', departure_time: '08:00 PM', arrival_time: '07:30 AM', duration: '11.5 hrs', price: 700, available_seats: 40, created_at: new Date().toISOString() },
+    { id: 21, operator_name: 'Charminar Express', transport_type: 'train', vehicle_type: 'AC 2-Tier', origin: 'Hyderabad', destination: 'Chennai', departure_time: '06:15 PM', arrival_time: '08:00 AM', duration: '13.7 hrs', price: 1200, available_seats: 52, created_at: new Date().toISOString() },
+    { id: 22, operator_name: 'Intercity SF', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Hyderabad', destination: 'Chennai', departure_time: '08:30 PM', arrival_time: '09:00 AM', duration: '12.5 hrs', price: 550, available_seats: 200, created_at: new Date().toISOString() },
+    { id: 23, operator_name: 'GSRTC AC', transport_type: 'bus', vehicle_type: 'A/C Seater', origin: 'Ahmedabad', destination: 'Surat', departure_time: '09:00 AM', arrival_time: '01:00 PM', duration: '4 hrs', price: 320, available_seats: 50, created_at: new Date().toISOString() },
+    { id: 24, operator_name: 'Patel Travels', transport_type: 'bus', vehicle_type: 'Non A/C Seater', origin: 'Ahmedabad', destination: 'Surat', departure_time: '03:00 PM', arrival_time: '07:30 PM', duration: '4.5 hrs', price: 220, available_seats: 45, created_at: new Date().toISOString() },
+    { id: 25, operator_name: 'Shatabdi Express', transport_type: 'train', vehicle_type: 'AC Chair Car', origin: 'Ahmedabad', destination: 'Surat', departure_time: '06:25 AM', arrival_time: '09:14 AM', duration: '2.8 hrs', price: 450, available_seats: 100, created_at: new Date().toISOString() },
+    { id: 26, operator_name: 'Bandra SF Express', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Ahmedabad', destination: 'Surat', departure_time: '05:20 PM', arrival_time: '08:20 PM', duration: '3 hrs', price: 210, available_seats: 180, created_at: new Date().toISOString() }
+];
+
+const initDatabase = () => {
+    console.log('Setting up the database...');
 
     if (fs.existsSync(DB_PATH)) {
-        const filebuffer = fs.readFileSync(DB_PATH);
-        db = new SQL.Database(filebuffer);
-        console.log('  → Loaded existing database');
+        console.log('  Puraani database.json mil gayi, load kar rahe hain');
     } else {
-        db = new SQL.Database();
-        console.log('  → Created new database');
-
-        // Create Tables
-        db.run(`
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                role TEXT DEFAULT 'customer'
-            );
-
-            CREATE TABLE routes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                operator_name TEXT NOT NULL,
-                transport_type TEXT NOT NULL, -- 'bus' or 'train'
-                vehicle_type TEXT NOT NULL,
-                origin TEXT NOT NULL,
-                destination TEXT NOT NULL,
-                departure_time TEXT NOT NULL,
-                arrival_time TEXT NOT NULL,
-                duration TEXT NOT NULL,
-                price INTEGER NOT NULL,
-                available_seats INTEGER NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE bookings (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                route_id INTEGER NOT NULL,
-                travel_date TEXT NOT NULL,
-                seats INTEGER NOT NULL,
-                total_price INTEGER NOT NULL,
-                status TEXT DEFAULT 'confirmed',
-                booked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id),
-                FOREIGN KEY (route_id) REFERENCES routes (id)
-            );
-        `);
-
-        // Seed Routes
-        console.log('  → Seeding routes table with sample data...');
-        const stmt = db.prepare(`
-            INSERT INTO routes (
-                operator_name, transport_type, vehicle_type, origin, destination, 
-                departure_time, arrival_time, duration, price, available_seats
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        const seedData = [
-            // Indore -> Bhopal (from original results)
-            ['Chartered Bus', 'bus', 'A/C Sleeper', 'Indore', 'Bhopal', '10:00 AM', '02:00 PM', '4 hrs', 500, 36],
-            ['Hans Travels', 'bus', 'Non A/C Seater', 'Indore', 'Bhopal', '01:30 PM', '06:00 PM', '4.5 hrs', 400, 45],
-            ['Intercity Express', 'bus', 'Premium Volvo', 'Indore', 'Bhopal', '05:00 PM', '08:30 PM', '3.5 hrs', 750, 32],
-            ['Shatabdi Express', 'train', 'AC Chair Car', 'Indore', 'Bhopal', '06:15 AM', '09:15 AM', '3 hrs', 350, 120],
-            ['Narmada Express', 'train', 'Sleeper Class', 'Indore', 'Bhopal', '02:00 PM', '07:00 PM', '5 hrs', 220, 200],
-            ['Malwa Express', 'train', 'AC 3-Tier', 'Indore', 'Bhopal', '11:00 PM', '04:30 AM', '5.5 hrs', 480, 72],
-
-            // Delhi -> Jaipur
-            ['RSRTC Volvo', 'bus', 'A/C Seater', 'Delhi', 'Jaipur', '08:00 AM', '01:00 PM', '5 hrs', 450, 40],
-            ['Double Decker', 'train', 'AC Chair Car', 'Delhi', 'Jaipur', '05:35 PM', '10:05 PM', '4.5 hrs', 500, 150],
-
-            // Mumbai -> Pune
-            ['Neeta Travels', 'bus', 'A/C Sleeper', 'Mumbai', 'Pune', '07:00 AM', '10:30 AM', '3.5 hrs', 350, 30],
-            ['Deccan Queen', 'train', 'AC Chair Car', 'Mumbai', 'Pune', '05:10 PM', '08:25 PM', '3.2 hrs', 400, 120]
-        ];
-
-        for (const row of seedData) {
-            stmt.run(row);
-        }
-        stmt.free();
-        
-        saveDatabase(db);
-        console.log(`  → Seeded ${seedData.length} sample routes`);
+        console.log('  Nayi database.json bana rahe hain...');
+        const initialData = {
+            users: [],
+            routes: sampleRoutes,
+            bookings: [],
+            _nextIds: {
+                users: 1,
+                bookings: 1
+            }
+        };
+        fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 4));
+        console.log(`  ${sampleRoutes.length} dummy routes add ho gaye`);
     }
 
-    console.log('✅ Database ready');
+    console.log('Database ekdum ready hai!');
+};
 
-    // Add save helper directly to the db instance
-    db.save = () => saveDatabase(db);
-    return db;
-}
+const getDB = () => {
+    if (!fs.existsSync(DB_PATH)) initDatabase();
+    const rawData = fs.readFileSync(DB_PATH);
+    return JSON.parse(rawData);
+};
 
-function saveDatabase(db) {
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(DB_PATH, buffer);
-}
+const saveDB = (data) => {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 4));
+};
 
-module.exports = { initDatabase };
+module.exports = { initDatabase, getDB, saveDB };

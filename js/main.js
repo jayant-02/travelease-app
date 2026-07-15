@@ -8,58 +8,61 @@
   HOW AUTH WORKS (for reverse engineering):
   ─────────────────────────────────────────
   • On signup, the backend hashes the password with bcrypt and
-  stores it in the SQLite database.
-  • On login, the backend verifies the password and returns a
-  JWT token (valid for 7 days).
-  • The frontend stores this token in localStorage.
-  • Every protected API call sends the token in the
-  "Authorization: Bearer <token>" header.
-  • The backend middleware decodes the token to identify the user.
+  • Signup pe, backend password ko bcrypt se hash karke SQLite DB mein save karta hai.
+  • Login pe, backend password verify karta hai aur JWT token (7 days valid) deta hai.
+  • Frontend is token ko localStorage mein rakhta hai.
+  • Har protected API call mein token ko "Authorization: Bearer <token>" header mein bheja jata hai.
+  • Backend middleware token ko decode karke user ki identity check karta hai.
 */
 
-const API_BASE = 'http://localhost:3000/api';
-
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  TOKEN & USER STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ==========================================
+// GLOBALS & CONFIG (Poore app ki settings)
+// ==========================================
+const API_BASE = 'http://localhost:8080/api';
 
 let currentUser = null;
 
+// ==========================================
+// AUTHENTICATION LOGIC (Login/Signup ka funda)
+// ==========================================
+
+// Token lao
 function getToken() {
-    return localStorage.getItem('travelease_token');
+    return localStorage.getItem('te_token');
 }
 
+// Token local storage mein daalo
 function setToken(token, user) {
-    localStorage.setItem('travelease_token', token);
-    localStorage.setItem('travelease_user', JSON.stringify(user));
+    localStorage.setItem('te_token', token);
+    localStorage.setItem('te_user', JSON.stringify(user));
     currentUser = user;
     updateNavbarAuth();
 }
 
+// Token nikal lo (logout karte waqt)
 function logout() {
-    localStorage.removeItem('travelease_token');
-    localStorage.removeItem('travelease_user');
+    localStorage.removeItem('te_token');
+    localStorage.removeItem('te_user');
     currentUser = null;
     updateNavbarAuth();
 
-    // If on a protected page, redirect home
+    // Agar protected page pe ho, toh home pe bhej do
     if (window.location.pathname.includes('bookings.html')) {
         window.location.href = 'index.html';
     }
 }
 
 function loadUser() {
-    const userStr = localStorage.getItem('travelease_user');
+    const userStr = localStorage.getItem('te_user');
     if (userStr) {
         try { currentUser = JSON.parse(userStr); } catch (e) { currentUser = null; }
     }
     updateNavbarAuth();
 }
 
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  NAVBAR UI UPDATE
+// Navbar mein login/logout button dikhana
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function updateNavbarAuth() {
@@ -67,26 +70,25 @@ function updateNavbarAuth() {
     if (!navActions) return;
 
     if (currentUser) {
-        // User is logged in — show their name, bookings link, and logout
+        // Agar user login hai — toh 'My Bookings' aur 'Logout' dikhao
         navActions.innerHTML = `
             <a href="bookings.html" class="nav-link-bookings">My Bookings</a>
             <button class="btn-nav" onclick="logout()">Logout</button>
         `;
     } else {
-        // Not logged in — show Sign In button
+        // Login nahi hai — toh Sign In button dikhao
         navActions.innerHTML = `
             <button class="btn-nav" onclick="openAuthModal()">Sign In</button>
         `;
     }
 }
 
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  AUTH MODAL (Inject once on page load)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function injectAuthModal() {
-    // Don't inject twice
+    // Double injection se bachao
     if (document.getElementById('authModal')) return;
 
     const html = `
@@ -148,7 +150,7 @@ function closeAuthModal() {
     const modal = document.getElementById('authModal');
     if (modal) {
         modal.classList.remove('active');
-        // Clear any error/success messages
+        // Purane messages saaf karo
         const err = document.getElementById('authError');
         const suc = document.getElementById('authSuccess');
         if (err) err.style.display = 'none';
@@ -157,7 +159,7 @@ function closeAuthModal() {
 }
 
 function switchAuthTab(tab) {
-    // Update tab active states
+    // Tab active states update karo
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
 
@@ -169,11 +171,10 @@ function switchAuthTab(tab) {
         document.getElementById('signupForm').classList.add('active');
     }
 
-    // Clear messages on tab switch
+    // Tab switch karne pe messages hata do
     document.getElementById('authError').style.display = 'none';
     document.getElementById('authSuccess').style.display = 'none';
 }
-
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  HANDLE LOGIN / SIGNUP
@@ -187,6 +188,8 @@ async function handleAuth(event, type) {
 
     const errorEl = document.getElementById('authError');
     const successEl = document.getElementById('authSuccess');
+    
+    // Purane errors chupa do
     errorEl.style.display = 'none';
     successEl.style.display = 'none';
 
@@ -205,29 +208,37 @@ async function handleAuth(event, type) {
             return;
         }
 
-        // Success — save token and close modal
+        if (type === 'signup') {
+            successEl.textContent = result.message;
+            successEl.style.display = 'block';
+            form.reset();
+            // Thodi der baad khud hi login tab pe switch kardo
+            setTimeout(() => switchAuthTab('login'), 1500);
+            return;
+        }
+
+        // Login success — token save karo aur modal band karo
         setToken(result.token, result.user);
         form.reset();
         closeAuthModal();
 
-        // If a page-specific callback exists (e.g. seat selection page),
-        // call it so the action can continue after login
+        // Agar kisi page ne callback set kiya hai toh run karo
         if (window.onAuthSuccess) {
             window.onAuthSuccess();
         }
 
     } catch (err) {
-        errorEl.textContent = 'Cannot connect to server. Make sure the backend is running on port 3000.';
+        errorEl.textContent = 'Server se connect nahi ho pa raha. Check karo backend chal raha hai ya nahi.';
         errorEl.style.display = 'block';
     }
 }
 
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  INITIALIZE ON PAGE LOAD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ==========================================
+// INIT (Page load hote hi ye run hoga)
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Auth modal daalo
     injectAuthModal();
+    // Check karo pehle se session hai kya
     loadUser();
 });

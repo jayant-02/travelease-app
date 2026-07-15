@@ -8,7 +8,7 @@ const routeRoutes = require('./routes/routes');
 const bookingRoutes = require('./routes/bookings');
 
 const app = express();
-const PORT = 3000;
+const PORT = 8080;
 
 // Middleware
 app.use(cors());
@@ -19,22 +19,20 @@ app.use(express.static(path.join(__dirname, '../')));
 
 async function startServer() {
     try {
-        // Initialize the database (sql.js is async)
-        const db = await initDatabase();
-        
-        // Make the db instance available to routers via req.app.locals
-        app.locals.db = db;
+        // JSON file se database initialize kar lo
+        initDatabase();
 
-        // API Routes
+        // API Routes setup kar rahe hain
         app.use('/api/auth', authRoutes);
         app.use('/api/routes', routeRoutes);
         app.use('/api/bookings', bookingRoutes);
 
-        // Fallback for SPA or static pages
+        // Agar koi unknown route aaye, toh frontend index file bhej do (SPA style)
         app.get('*', (req, res) => {
             res.sendFile(path.join(__dirname, '../index.html'));
         });
 
+        // Chalo server start karte hain
         app.listen(PORT, () => {
             console.log(`\n===========================================`);
             console.log(`  🚌 TravelEase Backend Server Running`);
