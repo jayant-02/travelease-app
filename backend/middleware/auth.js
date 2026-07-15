@@ -11,7 +11,7 @@ const protect = (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(401).json({ message: 'Aapne login nahi kiya hai (Token missing)' });
+        return res.status(401).json({ message: 'You are not logged in (Token missing)' });
     }
 
     try {

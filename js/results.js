@@ -22,9 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!origin || !destination) {
         document.getElementById('resultsContainer').innerHTML = `
             <div class="no-results">
-                <h3>Koi search parameters nahi mile</h3>
-                <p>Kripya homepage par wapas jaayen aur ek route search karein.</p>
-                <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Wapas Home</a>
+                <h3>No search parameters found</h3>
+                <p>Please return to the homepage and search for a route.</p>
+                <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Back Home</a>
             </div>
         `;
         return;
@@ -69,7 +69,7 @@ async function fetchResults(origin, destination, type) {
     const countEl = document.getElementById('resultCount');
 
     // Loading state dikhao
-    container.innerHTML = '<div class="loading-state">🔍 Sabse acche routes dhoondh rahe hain...</div>';
+    container.innerHTML = '<div class="loading-state">🔍 Finding the best routes...</div>';
 
     try {
         // Query parameters ke saath API URL banao
@@ -82,13 +82,13 @@ async function fetchResults(origin, destination, type) {
         if (!res.ok) throw new Error(data.message);
 
         // Result count text update karo
-        countEl.textContent = `${data.count} route${data.count !== 1 ? 's' : ''} mile`;
+        countEl.textContent = `${data.count} route${data.count !== 1 ? 's' : ''} found`;
 
         // Agar koi route nahi mila, toh empty state dikhao
         if (data.count === 0) {
             container.innerHTML = `
                 <div class="no-results">
-                    <h3>Koi routes nahi mile</h3>
+                    <h3>No routes found</h3>
                     <p>Hamein ${origin} se ${destination} tak koi ${type ? type : ''} nahi mili. Kuch aur search karke dekhein.</p>
                 </div>
             `;
@@ -102,7 +102,7 @@ async function fetchResults(origin, destination, type) {
         container.innerHTML = `
             <div class="no-results">
                 <h3 style="color: #ef4444;">Connection Error</h3>
-                <p>${err.message}. Check karein ki backend server chal raha hai ya nahi.</p>
+                <p>${err.message}. Please check if the backend server is running.</p>
             </div>
         `;
         countEl.textContent = 'Error';
@@ -144,7 +144,7 @@ function renderRouteCards(routes) {
             </div>
             <div class="route-action">
                 <div class="ticket-price">₹${route.price}</div>
-                <button class="btn-book" onclick="window.location.href='seat-selection.html?routeId=${route.id}&date=${date}'">Abhi Book Karein</button>
+                <button class="btn-book" onclick="window.location.href='seat-selection.html?routeId=${route.id}&date=${date}'">Book Now</button>
             </div>
         </div>
         `;

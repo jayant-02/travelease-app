@@ -228,7 +228,7 @@ async function handleAuth(event, type) {
         }
 
     } catch (err) {
-        errorEl.textContent = 'Server se connect nahi ho pa raha. Check karo backend chal raha hai ya nahi.';
+        errorEl.textContent = 'Cannot connect to server. Check if backend is running.';
         errorEl.style.display = 'block';
     }
 }

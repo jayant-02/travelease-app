@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchBookings(token) {
     const listEl = document.getElementById('bookingsList');
     // Load dikhao
-    listEl.innerHTML = '<div class="loading-state">Aapki bookings nikal rahe hain...</div>';
+    listEl.innerHTML = '<div class="loading-state">Fetching your bookings...</div>';
 
     try {
         const res = await fetch(`${API_BASE}/bookings/my`, {
@@ -39,7 +39,7 @@ async function fetchBookings(token) {
             listEl.innerHTML = `
                 <div class="no-results">
                     <h3>Abhi tak koi bookings nahi!</h3>
-                    <p>Lagta hai aapne abhi tak koi ticket book nahi kiya hai. Kuch explore karein!</p>
+                    <p>It looks like you have not booked any tickets yet. Explore some routes!</p>
                     <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Abhi Book Karein</a>
                 </div>
             `;
@@ -86,7 +86,7 @@ async function fetchBookings(token) {
 
 // Ticket cancel karne ka function
 async function cancelBooking(id) {
-    if (!confirm('Kya aap waqai apni ticket cancel karna chahte hain?')) return;
+    if (!confirm('Are you sure you want to cancel your ticket?')) return;
 
     const token = getToken();
 
