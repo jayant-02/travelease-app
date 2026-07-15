@@ -30,7 +30,7 @@ const sampleRoutes = [
     { id: 23, operator_name: 'GSRTC AC', transport_type: 'bus', vehicle_type: 'A/C Seater', origin: 'Ahmedabad', destination: 'Surat', departure_time: '09:00 AM', arrival_time: '01:00 PM', duration: '4 hrs', price: 320, available_seats: 50, created_at: new Date().toISOString() },
     { id: 24, operator_name: 'Patel Travels', transport_type: 'bus', vehicle_type: 'Non A/C Seater', origin: 'Ahmedabad', destination: 'Surat', departure_time: '03:00 PM', arrival_time: '07:30 PM', duration: '4.5 hrs', price: 220, available_seats: 45, created_at: new Date().toISOString() },
     { id: 25, operator_name: 'Shatabdi Express', transport_type: 'train', vehicle_type: 'AC Chair Car', origin: 'Ahmedabad', destination: 'Surat', departure_time: '06:25 AM', arrival_time: '09:14 AM', duration: '2.8 hrs', price: 450, available_seats: 100, created_at: new Date().toISOString() },
-    { id: 26, operator_name: 'Bandra SF Express', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Ahmedabad', destination: 'Surat', departure_time: '05:20 PM', arrival_time: '08:20 PM', duration: '3 hrs', price: 210, available_seats: 180, created_at: new Date().toISOString() }
+    // { id: 26, operator_name: 'Bandra SF Express', transport_type: 'train', vehicle_type: 'Sleeper Class', origin: 'Ahmedabad', destination: 'Surat', departure_time: '05:20 PM', arrival_time: '08:20 PM', duration: '3 hrs', price: 210, available_seats: 180, created_at: new Date().toISOString() }
 ];
 
 const initDatabase = () => {

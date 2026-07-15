@@ -1,5 +1,13 @@
 {
-    "users": [],
+    "users": [
+        {
+            "id": 1,
+            "username": "jayant",
+            "email": "testuser@gmail.com",
+            "password": "$2a$10$NNTahvMehmtQQ9oyqekvIOOOGnySRakC5ygtqlncr4mY8UFgFQgAW",
+            "role": "customer"
+        }
+    ],
     "routes": [
         {
             "id": 1,
@@ -12,7 +20,7 @@
             "arrival_time": "02:00 PM",
             "duration": "4 hrs",
             "price": 500,
-            "available_seats": 36,
+            "available_seats": 35,
             "created_at": "2026-07-15T13:34:53.588Z"
         },
         {
@@ -366,9 +374,20 @@
             "created_at": "2026-07-15T13:34:53.591Z"
         }
     ],
-    "bookings": [],
+    "bookings": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "route_id": 1,
+            "travel_date": "2026-07-15",
+            "seats": 1,
+            "total_price": 500,
+            "status": "confirmed",
+            "booked_at": "2026-07-15T14:28:23.584Z"
+        }
+    ],
     "_nextIds": {
-        "users": 1,
-        "bookings": 1
+        "users": 2,
+        "bookings": 2
     }
 }
