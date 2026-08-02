@@ -1,112 +1,121 @@
-/*
-  bookings.js — My Bookings Page Logic
-  Fetches the logged-in user's booking history from the API
-  User ki booking history API se fetch karta hai aur cards render karta hai. Ticket cancellation bhi yahi handle hota hai.
-*/
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!getToken()) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Thoda wait karo jab tak main.js auth initialize ho jaye
-    setTimeout(() => {
-        const token = getToken();
+    try {
+        const [bookingsRes, cabsRes] = await Promise.all([
+            fetch(`${API_BASE}/bookings/my`, { headers: { 'Authorization': `Bearer ${getToken()}` } }),
+            fetch(`${API_BASE}/cabs/my`, { headers: { 'Authorization': `Bearer ${getToken()}` } })
+        ]);
 
-        // Agar token nahi hai, toh page access nahi karne do
-        if (!token) {
-            window.location.href = 'index.html';
-            return;
-        }
+        const bookings = await bookingsRes.json();
+        const cabs = await cabsRes.json();
 
-        // Backend se bookings laao
-        fetchBookings(token);
-    }, 150);
+        calculateStats(bookings);
+        renderBookings(bookings);
+        renderCabs(cabs);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+    }
 });
 
-// Fetch user's bookings from API
-async function fetchBookings(token) {
-    const listEl = document.getElementById('bookingsList');
-    // Load dikhao
-    listEl.innerHTML = '<div class="loading-state">Fetching your bookings...</div>';
+// Stats calculate karo
+const calculateStats = (bookings) => {
+    const confirmed = bookings.filter(b => b.status === 'confirmed');
+    document.getElementById('totalTrips').textContent = confirmed.length;
+    
+    const totalSpent = confirmed.reduce((sum, b) => sum + b.totalPrice, 0);
+    document.getElementById('totalSpent').textContent = `₹${totalSpent}`;
 
-    try {
-        const res = await fetch(`${API_BASE}/bookings/my`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-
-        // Agar koi booking nahi hai
-        if (!data || data.count === 0) {
-            listEl.innerHTML = `
-                <div class="no-results">
-                    <h3>Abhi tak koi bookings nahi!</h3>
-                    <p>It looks like you have not booked any tickets yet. Explore some routes!</p>
-                    <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Abhi Book Karein</a>
-                </div>
-            `;
-            return;
-        }
-
-        // List saaf karo aur cards render karo
-        let html = '';
-        data.bookings.forEach(booking => {
-            const isConfirmed = booking.status === 'confirmed';
-            const statusClass = isConfirmed ? 'status-confirmed' : 'status-cancelled';
-
-            html += `
-            <div class="booking-card">
-                <div>
-                    <div class="booking-route">${booking.origin} → ${booking.destination}</div>
-                    <div class="booking-details">
-                    ${booking.operator_name || 'Unknown Operator'} · ${booking.vehicle_type || ''}<br>
-                        Date: ${booking.travel_date} · ${booking.departure_time || ''} → ${booking.arrival_time || ''}<br>
-                        Seats: ${booking.seats} · ${booking.duration || ''}
-                    </div>
-                    <span class="booking-status ${statusClass}">${booking.status}</span>
-                </div>
-                <div style="text-align:right;">
-                    <div class="booking-price">₹${booking.total_price}</div>
-                    ${isConfirmed ? `<button class="btn-cancel" onclick="cancelBooking(${booking.booking_id})">Cancel Ticket</button>` : ''}
-                </div>
-            </div>
-            `;
-        });
-
-        listEl.innerHTML = html;
-
-    } catch (err) {
-        // Agar error aaye
-        listEl.innerHTML = `
-            <div class="no-results" style="color:var(--coral);">
-                <h3>Arey yaar!</h3>
-                <p>Bookings load nahi ho paayin. Connection check karo: ${err.message}</p>
-            </div>
-        `;
-    }
-}
-
-// Ticket cancel karne ka function
-async function cancelBooking(id) {
-    if (!confirm('Are you sure you want to cancel your ticket?')) return;
-
-    const token = getToken();
-
-    try {
-        // Cancel API pe call karo
-        const res = await fetch(`${API_BASE}/bookings/${id}/cancel`, {
-            method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-
-        // Cancel ho gaya
-        alert('Booking cancel ho gayi! Refund jaldi hi process ho jayega.');
+    if (confirmed.length > 0) {
+        const destCount = {};
+        let favCity = '';
+        let maxCount = 0;
         
-        // Nayi list manga lo
-        fetchBookings(token); 
-
-    } catch (err) {
-        alert('Failed to cancel: ' + err.message);
+        confirmed.forEach(b => {
+            const dest = b.route.destination;
+            destCount[dest] = (destCount[dest] || 0) + 1;
+            if (destCount[dest] > maxCount) {
+                maxCount = destCount[dest];
+                favCity = dest;
+            }
+        });
+        document.getElementById('favCity').textContent = favCity;
     }
-}
+};
+
+// Route bookings render karo
+const renderBookings = (bookings) => {
+    const container = document.getElementById('bookingsList');
+    if (!container) return;
+    if (bookings.length === 0) {
+        container.innerHTML = '<p>No bookings found.</p>';
+        return;
+    }
+
+    container.innerHTML = bookings.map(b => `
+        <div class="booking-card">
+            <div class="d-flex justify-between">
+                <h4>${b.route.origin} to ${b.route.destination}</h4>
+                <span class="badge badge-${b.status === 'confirmed' ? 'success' : 'danger'}">${b.status}</span>
+            </div>
+            <p><strong>Date:</strong> ${new Date(b.travelDate).toLocaleDateString()}</p>
+            <p><strong>Seats:</strong> ${b.seats}</p>
+            <p><strong>Total:</strong> ₹${b.totalPrice}</p>
+            ${b.status === 'confirmed' ? `<button onclick="cancelBooking('${b._id}')" class="btn btn-outline-danger mt-2">Cancel Ticket</button>` : ''}
+        </div>
+    `).join('');
+};
+
+// Cab bookings render karo
+const renderCabs = (cabs) => {
+    const container = document.getElementById('cabBookingsList');
+    if (!container) return; // if element doesn't exist on page
+    if (cabs.length === 0) {
+        container.innerHTML = '<p>No cab bookings found.</p>';
+        return;
+    }
+
+    container.innerHTML = cabs.map(c => `
+        <div class="booking-card">
+            <div class="d-flex justify-between">
+                <h4>Cab: ${c.pickup} to ${c.dropoff}</h4>
+                <span class="badge badge-${c.status === 'confirmed' ? 'success' : 'danger'}">${c.status}</span>
+            </div>
+            <p><strong>Type:</strong> <span class="capitalize">${c.cabType}</span></p>
+            <p><strong>Estimated Fare:</strong> ₹${c.estimatedFare}</p>
+            ${c.status === 'confirmed' ? `<button onclick="cancelCab('${c._id}')" class="btn btn-outline-danger mt-2">Cancel Cab</button>` : ''}
+        </div>
+    `).join('');
+};
+
+// Booking cancel API call
+window.cancelBooking = async (id) => {
+    if (!confirm('Are you sure you want to cancel this ticket?')) return;
+    try {
+        const res = await fetch(`${API_BASE}/bookings/cancel/${id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        if (res.ok) window.location.reload();
+        else alert('Failed to cancel booking');
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+window.cancelCab = async (id) => {
+    if (!confirm('Are you sure you want to cancel this cab?')) return;
+    try {
+        const res = await fetch(`${API_BASE}/cabs/cancel/${id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        if (res.ok) window.location.reload();
+        else alert('Failed to cancel cab');
+    } catch (e) {
+        console.error(e);
+    }
+};

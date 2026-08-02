@@ -1,306 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TravelEase — Book Bus & Train Tickets</title>
-    <meta name="description" content="Find and book bus and train tickets across India. Compare routes, pick your seat, and travel easy.">
-
-    <!-- Fonts — Nunito for the bubbly, friendly feel -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelEase — Book Bus & Train Tickets</title>
+  <meta name="description" content="Book your bus and train tickets easily with TravelEase. India's smartest travel platform.">
+  
+  <!-- Google Fonts: Inter font load kar rahe hain -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome icons ke liye -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- CSS stylesheets -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
 
-    <!-- Upar wala Navigation Bar -->
-    <nav class="navbar" id="navbar">
-        <div class="navbar-inner">
-
-            <a href="index.html" class="nav-logo"><img src="images/logo.png" alt="TravelEase Logo" style="height: 32px; width: 32px; border-radius: 8px; object-fit: cover;"> TravelEase</a>
-
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#footer">Contact</a></li>
-            </ul>
-
-            <div style="display:flex; align-items:center; gap:12px;">
-                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
-                <div class="nav-actions" id="navActions">
-                    <button class="btn-nav" onclick="openAuthModal()">Sign In</button>
-                </div>
-            </div>
-
+  <!-- Navbar section shuru -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="images/logo.png" alt="TravelEase" style="height:32px;width:32px;border-radius:8px;object-fit:cover;"> TravelEase
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="#how-it-works"><i class="fas fa-info-circle"></i> How It Works</a></li>
+        <li><a href="#footer"><i class="fas fa-envelope"></i> Contact</a></li>
+      </ul>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+        <div class="nav-actions" id="navActions">
+          <button class="btn-nav" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
         </div>
-    </nav>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Main Hero Section (Search box idhar hi hai) -->
-    <section class="hero">
-        <div class="hero-inner">
-
-            <!-- Bada sa headline -->
-            <div class="hero-text fade-up">
-                <div class="hero-tag">✦ India's Favourite Travel App</div>
-                <h1>Travel made<br><span>effortless.</span></h1>
-                <p>Compare buses and trains across hundreds of routes. Find the best fares and book your seat in seconds.</p>
-            </div>
-
-            <!-- Search wala box -->
-            <div class="search-card fade-up fade-up-d2">
-
-                <!-- Transport type chunne ke liye (Bus/Train) -->
-                <div class="transport-tabs" id="transportTabs">
-                    <input type="radio" id="tab-all" name="transport" value="" checked>
-                    <label for="tab-all">All </label>
-                    <input type="radio" id="tab-bus" name="transport" value="bus">
-                    <label for="tab-bus">Bus</label>
-                    <input type="radio" id="tab-train" name="transport" value="train">
-                    <label for="tab-train">Train</label>
-                </div>
-
-                <!-- Asli search form -->
-                <form class="search-form" id="searchForm" onsubmit="handleSearch(event)">
-                    <input type="hidden" name="type" id="transportType" value="">
-
-                    <div class="form-field">
-                        <label for="origin">From</label>
-                        <div class="autocomplete-wrapper">
-                            <input type="text" id="origin" name="origin" placeholder="OnBoarding Location" required autocomplete="off">
-                            <div class="autocomplete-list" id="originList"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="destination">To</label>
-                        <div class="autocomplete-wrapper">
-                            <input type="text" id="destination" name="destination" placeholder="Destination" required autocomplete="off">
-                            <div class="autocomplete-list" id="destList"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-field">
-                        <label>Date</label>
-                        <div class="custom-datepicker" id="customDatePicker">
-                            <div class="calendar-input" id="cdpInput">
-                                <span id="calendarDateText">Pick a date</span>
-                                <input type="hidden" name="date" id="date" required>
-                            </div>
-                            <div class="calendar-dropdown" id="cdpDropdown">
-                                <div class="calendar-header">
-                                    <button type="button" id="calendarPrev">&#8249;</button>
-                                    <div class="calendar-month-year" id="cdpMonthYear"></div>
-                                    <button type="button" id="calendarNext">&#8250;</button>
-                                </div>
-                                <div class="calendar-weekdays">
-                                    <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-                                </div>
-                                <div class="calendar-days" id="cdpDays"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-search">Search →</button>
-                </form>
-            </div>
-
+  <!-- Hero Section jahan user search karega -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="tag-pill">✈ India's Smartest Travel Platform</span>
+        <h1>Travel made<br><span>effortless.</span></h1>
+        <p>Book your bus and train tickets in just a few clicks. Best prices guaranteed.</p>
+      </div>
+      
+      <!-- Search Card form -->
+      <div class="search-card">
+        <div class="transport-tabs">
+          <label><input type="radio" name="transport" value="All" checked> All</label>
+          <label><input type="radio" name="transport" value="Bus"> Bus</label>
+          <label><input type="radio" name="transport" value="Train"> Train</label>
         </div>
-    </section>
-
-    <!-- App ke main features dikhane ke liye strip -->
-    <section class="features-strip" id="features">
-        <div class="container">
-            <div class="features-grid">
-                <div class="feature-box fade-up fade-up-d1">
-                    <div class="feature-icon purple">₹</div>
-                    <div class="feature-title">Best Prices</div>
-                    <div class="feature-sub">Compare fares instantly</div>
-                </div>
-                <div class="feature-box fade-up fade-up-d2">
-                    <div class="feature-icon coral">✓</div>
-                    <div class="feature-title">Easy Booking</div>
-                    <div class="feature-sub">Book in under a minute</div>
-                </div>
-                <div class="feature-box fade-up fade-up-d3">
-                    <div class="feature-icon teal">⊞</div>
-                    <div class="feature-title">Choose Your Seat</div>
-                    <div class="feature-sub">Pick exactly where you sit</div>
-                </div>
-                <div class="feature-box fade-up fade-up-d4">
-                    <div class="feature-icon yellow">◎</div>
-                    <div class="feature-title">24/7 Support</div>
-                    <div class="feature-sub">We're always here for you</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- App kaise kaam karta hai, uske steps -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="container">
-            <span class="section-label">Simple Process</span>
-            <h2 class="section-title">How It Works</h2>
-            <p class="section-subtitle">Book your ticket in three easy steps — no hassle, no hidden fees.</p>
-
-            <div class="hiw-grid">
-                <div class="hiw-card fade-up fade-up-d1">
-                    <div class="hiw-icon">⌕</div>
-                    <h3>Search Routes</h3>
-                    <p>Enter your origin and destination. We show every available bus and train with live pricing.</p>
-                </div>
-                <div class="hiw-card fade-up fade-up-d2">
-                    <div class="hiw-icon">⊟</div>
-                    <h3>Pick Your Seat</h3>
-                    <p>See the seat layout, choose where you want to sit, and know exactly what you'll pay.</p>
-                </div>
-                <div class="hiw-card fade-up fade-up-d3">
-                    <div class="hiw-icon">✓</div>
-                    <h3>Confirm & Travel</h3>
-                    <p>Complete your booking instantly. Get your e-ticket — show it at boarding and you're set.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Niche ka Footer -->
-    <footer class="footer" id="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="nav-logo">
-                        <img src="images/logo.png" alt="TravelEase Logo" style="height: 32px; width: 32px; border-radius: 8px; object-fit: cover;"> TravelEase
-                    </div>
-                    <p>Making bus and train travel simple, affordable, and enjoyable for millions of passengers across India.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <a href="#">About Us</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Blog</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Support</h4>
-                    <a href="#">Help Centre</a>
-                    <a href="#">Contact Us</a>
-                    <a href="#">FAQs</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Legal</h4>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Refund Policy</a>
-                </div>
-            </div>
-            <div class="footer-bottom">© 2026 TravelEase. All rights reserved.</div>
-        </div>
-    </footer>
-
-    <script src="js/main.js"></script>
-    <script src="js/datepicker.js"></script>
-    <script>
-        // Scroll karne par navbar solid ho jayega
-        window.addEventListener('scroll', function () {
-            document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
-        });
-
-        // Phone pe menu kholne ke liye hamburger toggle
-        document.getElementById('menuToggle').addEventListener('click', function () {
-            const menu = document.getElementById('navMenu');
-            if (menu.style.display === 'flex') {
-                menu.style.display = 'none';
-            } else {
-                menu.style.display = 'flex';
-                menu.style.flexDirection = 'column';
-                menu.style.position = 'absolute';
-                menu.style.top = '100%';
-                menu.style.left = '0';
-                menu.style.right = '0';
-                menu.style.background = 'white';
-                menu.style.padding = '16px 32px';
-                menu.style.gap = '12px';
-                menu.style.boxShadow = '0 8px 24px rgba(108,99,255,0.15)';
-            }
-        });
-
-        // Radio buttons ko hidden input ke saath sync rakho
-        document.querySelectorAll('#transportTabs input[type="radio"]').forEach(function (radio) {
-            radio.addEventListener('change', function () {
-                document.getElementById('transportType').value = this.value;
-            });
-        });
-
-        // Form submit hone pe kya karna hai — bina login ke search nahi karne dega
-        function handleSearch(event) {
-            event.preventDefault();
-
-            if (!getToken()) {
-                openAuthModal();
-                return;
-            }
-
-            const origin = document.getElementById('origin').value.trim();
-            const destination = document.getElementById('destination').value.trim();
-            const date = document.getElementById('date').value;
-            const type = document.getElementById('transportType').value;
-
-            localStorage.setItem('last_origin', origin);
-            localStorage.setItem('last_dest', destination);
-
-            let url = `results.html?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&date=${date}`;
-            if (type) url += `&type=${type}`;
-
-            window.location.href = url;
-        }
-
-        // City auto-predict / autocomplete ka logic
-        const cities = ["Indore", "Bhopal", "Delhi", "Jaipur", "Mumbai", "Pune", "Bangalore", "Mysore", "Hyderabad", "Chennai", "Ahmedabad", "Surat"].sort();
         
-        function setupAutocomplete(inputId, listId) {
-            const input = document.getElementById(inputId);
-            const list = document.getElementById(listId);
+        <form class="search-form" id="searchForm">
+          <div class="autocomplete-wrapper">
+            <input type="text" id="fromInput" placeholder="Leaving from..." required autocomplete="off">
+            <ul class="autocomplete-list" id="fromList"></ul>
+          </div>
+          
+          <div class="autocomplete-wrapper">
+            <input type="text" id="toInput" placeholder="Going to..." required autocomplete="off">
+            <ul class="autocomplete-list" id="toList"></ul>
+          </div>
+          
+          <div class="custom-datepicker">
+            <input type="date" id="dateInput" required>
+          </div>
+          
+          <button type="button" class="btn-search" onclick="handleSearch()"><i class="fas fa-search"></i> Search</button>
+        </form>
+      </div>
+    </div>
+  </section>
 
-            input.addEventListener('input', function() {
-                const val = this.value.trim();
-                list.innerHTML = '';
-                if (!val) {
-                    list.classList.remove('open');
-                    return;
-                }
-                
-                const matches = cities.filter(c => c.toLowerCase().includes(val.toLowerCase()));
-                if (matches.length === 0) {
-                    list.classList.remove('open');
-                    return;
-                }
+  <!-- Features Strip for benefits -->
+  <section class="features-strip">
+    <div class="feature-box">
+      <i class="fas fa-tags"></i>
+      <h4>Best Prices</h4>
+      <p>Compare fares instantly</p>
+    </div>
+    <div class="feature-box">
+      <i class="fas fa-bolt"></i>
+      <h4>Easy Booking</h4>
+      <p>Book in under a minute</p>
+    </div>
+    <div class="feature-box">
+      <i class="fas fa-chair"></i>
+      <h4>Choose Your Seat</h4>
+      <p>Pick exactly where you sit</p>
+    </div>
+    <div class="feature-box">
+      <i class="fas fa-headset"></i>
+      <h4>24/7 Support</h4>
+      <p>We're always here for you</p>
+    </div>
+  </section>
 
-                matches.forEach(match => {
-                    const div = document.createElement('div');
-                    // Matching city ka naam highlight karne ke liye
-                    const regex = new RegExp(`(${val})`, "gi");
-                    div.innerHTML = match.replace(regex, "<strong>$1</strong>");
-                    div.addEventListener('click', function() {
-                        input.value = match;
-                        list.classList.remove('open');
-                    });
-                    list.appendChild(div);
-                });
-                list.classList.add('open');
-            });
+  <!-- How It Works steps -->
+  <section id="how-it-works" class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="cards-grid">
+      <div class="card">
+        <i class="fas fa-search"></i>
+        <h3>Search Routes</h3>
+        <p>Find the best buses and trains matching your schedule.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-th"></i>
+        <h3>Pick Your Seat</h3>
+        <p>View the layout and select your favorite spot.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Confirm & Travel</h3>
+        <p>Pay securely and get your digital ticket instantly.</p>
+      </div>
+    </div>
+  </section>
 
-            // Jab bahar click ho toh dropdown band kardo
-            document.addEventListener('click', function (e) {
-                if (e.target !== input) {
-                    list.classList.remove('open');
-                }
-            });
+  <!-- Trending Destinations section -->
+  <section class="trending-destinations">
+    <div class="container">
+      <span class="section-label">Top Choice</span>
+      <h2 class="section-title">Trending Destinations</h2>
+      <p class="section-subtitle">Explore India's most popular travel routes and destinations.</p>
+      
+      <div class="dest-grid">
+        <div class="dest-card">
+          <img class="dest-img" src="images/dest_goa.jpg" alt="Goa">
+          <div class="dest-info">
+            <h3 class="dest-title">Goa</h3>
+            <p class="dest-desc">Relax on pristine beaches, enjoy vibrant nightlife, and historic Portuguese churches.</p>
+            <button class="btn-explore">Explore Routes</button>
+          </div>
+        </div>
+        
+        <div class="dest-card">
+          <img class="dest-img" src="images/dest_jaipur.jpg" alt="Jaipur">
+          <div class="dest-info">
+            <h3 class="dest-title">Jaipur</h3>
+            <p class="dest-desc">Witness the grand architecture of the Hawa Mahal, Amer Fort, and royal pink city palaces.</p>
+            <button class="btn-explore">Explore Routes</button>
+          </div>
+        </div>
+        
+        <div class="dest-card">
+          <img class="dest-img" src="images/dest_manali.jpg" alt="Manali">
+          <div class="dest-info">
+            <h3 class="dest-title">Manali</h3>
+            <p class="dest-desc">Experience the magic of snow-capped Solang Valley and adventure sports in the Himalayas.</p>
+            <button class="btn-explore">Explore Routes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer block -->
+  <footer id="footer" class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>TravelEase</h3>
+        <p>India's Smartest Travel Platform</p>
+      </div>
+      <div class="footer-links">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">FAQs</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Refund Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TravelEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/datepicker.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080/api';
+    
+    // Navbar scroll toggle logic yahan hai
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if(window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile menu toggle
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      document.getElementById('navMenu').classList.toggle('active');
+    });
+
+    // Search handle karne ka function
+    function handleSearch() {
+      const from = document.getElementById('fromInput').value;
+      const to = document.getElementById('toInput').value;
+      const date = document.getElementById('dateInput').value;
+      const transport = document.querySelector('input[name="transport"]:checked').value;
+      
+      if(from && to && date) {
+        window.location.href = `results.html?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${date}&type=${transport}`;
+      } else {
+        alert('Please fill all search details!');
+      }
+    }
+
+    // Autocomplete fetch example
+    async function setupAutocomplete() {
+      try {
+        // API call to fetch cities
+        const response = await fetch(`${API_BASE}/routes/cities`);
+        if(response.ok) {
+          const cities = await response.json();
+          // Logic for applying cities to autocomplete
+          console.log("Cities loaded:", cities);
         }
+      } catch (err) {
+        console.error("Cities load nahi ho payi:", err);
+      }
+    }
 
-        setupAutocomplete('origin', 'originList');
-        setupAutocomplete('destination', 'destList');
-
-    </script>
-
+    setupAutocomplete();
+  </script>
 </body>
 </html>

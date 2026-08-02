@@ -1,56 +1,46 @@
-const { getDB } = require('../database/init');
+const Route = require('../models/Route');
 
-// Origin, destination aur type ke hisaab se route search karne ke liye
-const searchRoutes = (req, res) => {
-    let { origin, destination, type } = req.query;
+// Routes search karo (origin and destination se)
+exports.searchRoutes = async (req, res) => {
+  try {
+    const { origin, destination, type } = req.query;
+    let query = {};
+    
+    if (origin) query.origin = new RegExp(origin, 'i'); // case-insensitive
+    if (destination) query.destination = new RegExp(destination, 'i');
+    if (type) query.transportType = type;
 
-    if (!origin || !destination) {
-        return res.status(400).json({ message: 'Origin and destination are required' });
-    }
-
-    // Search string ko theek karlo (spaces hata do aur lowercase me kardo)
-    origin = origin.trim().toLowerCase();
-    destination = destination.trim().toLowerCase();
-
-    try {
-        const db = getDB();
-        
-        let results = db.routes.filter(r => 
-            r.origin.toLowerCase() === origin && 
-            r.destination.toLowerCase() === destination
-        );
-
-        if (type) {
-            results = results.filter(r => r.transport_type === type.toLowerCase());
-        }
-
-        res.json({
-            count: results.length,
-            origin: req.query.origin, // Original format wapas bhejo
-            destination: req.query.destination, // Original format wapas bhejo
-            routes: results
-        });
-    } catch (err) {
-        res.status(500).json({ message: 'Server error while searching routes', error: err.message });
-    }
+    const routes = await Route.find(query);
+    res.json(routes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
 };
 
-// ID ke according single route le aao
-const getRouteById = (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const db = getDB();
-        const route = db.routes.find(r => r.id === parseInt(id));
-
-        if (!route) {
-            return res.status(404).json({ message: 'Route not found' });
-        }
-
-        res.json(route);
-    } catch (err) {
-        res.status(500).json({ message: 'Server error fetching route', error: err.message });
-    }
+// Route by ID dhoondho
+exports.getRouteById = async (req, res) => {
+  try {
+    const route = await Route.findById(req.params.id);
+    if (!route) return res.status(404).json({ error: 'Route not found' });
+    res.json(route);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
 };
 
-module.exports = { searchRoutes, getRouteById };
+// Sab cities ke names nikalte hain, unique aur sorted
+exports.getCities = async (req, res) => {
+  try {
+    const origins = await Route.distinct('origin');
+    const destinations = await Route.distinct('destination');
+    
+    // Set ka use karke duplicate hata do
+    const cities = [...new Set([...origins, ...destinations])].sort();
+    res.json(cities);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

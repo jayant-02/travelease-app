@@ -1,50 +1,41 @@
+require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-const { initDatabase } = require('./database/init');
 
-const authRoutes = require('./routes/auth');
-const routeRoutes = require('./routes/routes');
-const bookingRoutes = require('./routes/bookings');
-
+// Express app initialize karte hain
 const app = express();
-const PORT = 8080;
 
-// Middleware
+// Middlewares setup
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files from the parent directory
+// Routes mount karte hain
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/routes', require('./routes/routes'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/cabs', require('./routes/cabs'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/reviews', require('./routes/reviews'));
+
+// Static files (frontend) parent directory se serve karte hain
 app.use(express.static(path.join(__dirname, '../')));
 
-async function startServer() {
-    try {
-        // JSON file se database initialize kar lo
-        initDatabase();
+// Fallback route index.html bhejne ke liye (SPA routing support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../index.html'));
+});
 
-        // API Routes setup kar rahe hain
-        app.use('/api/auth', authRoutes);
-        app.use('/api/routes', routeRoutes);
-        app.use('/api/bookings', bookingRoutes);
-
-        // Agar koi unknown route aaye, toh frontend index file bhej do (SPA style)
-        app.get('*', (req, res) => {
-            res.sendFile(path.join(__dirname, '../index.html'));
-        });
-
-        // Chalo server start karte hain
-        app.listen(PORT, () => {
-            console.log(`\n===========================================`);
-            console.log(`  🚌 TravelEase Backend Server Running`);
-            console.log(`===========================================`);
-            console.log(`  🌐 Frontend:  http://localhost:${PORT}`);
-            console.log(`  📡 API Base:  http://localhost:${PORT}/api\n`);
-        });
-
-    } catch (err) {
-        console.error('Failed to start server:', err);
-        process.exit(1);
-    }
-}
-
-startServer();
+// MongoDB se connect karte hain aur server start karte hain
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+  console.log('MongoDB connected successfully');
+  const PORT = process.env.PORT || 8080;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+})
+.catch((err) => {
+  console.error('MongoDB connection error:', err);
+});

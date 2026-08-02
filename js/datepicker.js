@@ -1,113 +1,103 @@
-/*
-  datepicker.js — Apna custom Date Picker (Calender) logic
-*/
-
+// Datepicker init on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-    const inputContainer = document.getElementById('cdpInput');
-    const dropdown = document.getElementById('cdpDropdown');
-    const monthYear = document.getElementById('cdpMonthYear');
-    const daysContainer = document.getElementById('cdpDays');
-    const prevBtn = document.getElementById('calendarPrev');
-    const nextBtn = document.getElementById('calendarNext');
-    const dateText = document.getElementById('calendarDateText');
-    const hiddenInput = document.getElementById('date');
-
-    if (!inputContainer) return; // Sirf tab chalega jab page pe datepicker hoga
+    const customDatePicker = document.getElementById('customDatePicker');
+    if (!customDatePicker) return; // Agar page par datepicker nahi hai toh exit karo
+    
+    const cdpInput = document.getElementById('cdpInput');
+    const cdpDropdown = document.getElementById('cdpDropdown');
+    const cdpDays = document.getElementById('cdpDays');
+    const cdpMonthYear = document.getElementById('cdpMonthYear');
+    const calendarPrev = document.getElementById('calendarPrev');
+    const calendarNext = document.getElementById('calendarNext');
+    const calendarDateText = document.getElementById('calendarDateText');
+    const hiddenDateInput = document.getElementById('date');
 
     let currentDate = new Date();
-    let currentMonth = currentDate.getMonth();
-    let currentYear = currentDate.getFullYear();
-    let selectedDate = null;
+    let selectedDate = new Date();
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Calendar render karne ka logic
+    const renderCalendar = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        cdpMonthYear.textContent = `${monthNames[month]} ${year}`;
+        
+        cdpDays.innerHTML = '';
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-    // Dropdown ko kholne/band karne ke liye
-    inputContainer.addEventListener('click', (e) => {
-        dropdown.classList.toggle('open');
-        e.stopPropagation();
-    });
-
-    // Jab bahar click ho toh dropdown band kardo
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-datepicker')) {
-            dropdown.classList.remove('open');
-        }
-    });
-
-    // Pichla mahina (Prev) aur agla mahina (Next)
-    prevBtn.addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-        renderCalendar();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-        renderCalendar();
-    });
-
-    function renderCalendar() {
-        monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-        daysContainer.innerHTML = '';
-
-        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-        // Mahine ke start date se pehle ke khali dabbe
+        // Khali cells start of month ke liye
         for (let i = 0; i < firstDay; i++) {
-            const empty = document.createElement('div');
-            empty.className = 'calendar-day empty';
-            daysContainer.appendChild(empty);
+            cdpDays.innerHTML += `<div></div>`;
         }
 
-        // Mahine ke asli din
+        // Days render karo
         for (let i = 1; i <= daysInMonth; i++) {
-            const dateObj = new Date(currentYear, currentMonth, i);
-            const dayEl = document.createElement('div');
-            dayEl.className = 'calendar-day';
-            dayEl.textContent = i;
-
-            // Agar purani date hai toh disable kardo (grey)
-            if (dateObj < today) {
-                dayEl.classList.add('disabled');
-            } else {
-                // Agar already selected hai toh highlight karo
-                if (selectedDate && 
-                    selectedDate.getDate() === i && 
-                    selectedDate.getMonth() === currentMonth && 
-                    selectedDate.getFullYear() === currentYear) {
-                    dayEl.classList.add('selected');
-                }
-
-                // Din par click karne ka event
-                dayEl.addEventListener('click', () => {
-                    selectedDate = new Date(currentYear, currentMonth, i);
-                    
-                    // Form mein bhejne ke liye YYYY-MM-DD format banao
-                    const y = selectedDate.getFullYear();
-                    const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
-                    const d = String(selectedDate.getDate()).padStart(2, '0');
-                    const formattedValue = `${y}-${m}-${d}`;
-                    
-                    hiddenInput.value = formattedValue;
-                    
-                    // Screen pe dikhane ke liye format (jaise 15 Jul 2026)
-                    const displayFormat = `${d} ${monthNames[selectedDate.getMonth()].substring(0,3)} ${y}`;
-                    dateText.innerHTML = `📅 ${displayFormat}`;
-                    inputContainer.classList.add('has-value');
-
-                    dropdown.classList.remove('open');
-                    renderCalendar(); // Nayi selected date dikhane ke liye dobara render karo
-                });
+            const dateObj = new Date(year, month, i);
+            const isPast = dateObj < today;
+            const isSelected = selectedDate && dateObj.getTime() === selectedDate.getTime();
+            
+            const dayDiv = document.createElement('div');
+            dayDiv.className = `cdp-day ${isPast ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`;
+            dayDiv.textContent = i;
+            
+            if (!isPast) {
+                dayDiv.onclick = () => selectDate(new Date(year, month, i));
             }
-
-            daysContainer.appendChild(dayEl);
+            
+            cdpDays.appendChild(dayDiv);
         }
-    }
+    };
 
-    renderCalendar();
+    // Date select karne ka function
+    const selectDate = (date) => {
+        selectedDate = date;
+        
+        // YYYY-MM-DD format banalo
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
+        if (hiddenDateInput) hiddenDateInput.value = formattedDate;
+        
+        // Display text format (e.g., 15 Aug 2023)
+        const displayFormat = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        if (calendarDateText) calendarDateText.textContent = displayFormat;
+        
+        renderCalendar();
+        cdpDropdown.style.display = 'none';
+    };
+
+    // Events attach karo
+    cdpInput.onclick = (e) => {
+        e.stopPropagation();
+        const isVisible = cdpDropdown.style.display === 'block';
+        cdpDropdown.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible) renderCalendar();
+    };
+
+    calendarPrev.onclick = (e) => {
+        e.stopPropagation();
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    };
+
+    calendarNext.onclick = (e) => {
+        e.stopPropagation();
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    };
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+        if (!customDatePicker.contains(e.target)) {
+            cdpDropdown.style.display = 'none';
+        }
+    });
+
+    // Default select today
+    selectDate(new Date());
 });

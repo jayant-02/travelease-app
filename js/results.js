@@ -1,154 +1,141 @@
-/*
-  results.js — Dynamic Search Results Page
-  This script runs on results.html.
-  It reads the URL parameters (origin, destination, date, type),
-  calls the backend API to fetch matching routes, and renders
-  Yeh script results.html pe chalti hai.
-  Yeh URL parameters (origin, destination, date, type) ko read karti hai,
-  backend API ko call karke routes fetch karti hai, aur cards ko dynamically render karti hai.
-  Filter tabs (All / Bus / Train) click karne par API se fir se data fetch hota hai,
-  isliye filtering SERVER side par hoti hai.
-*/
-
 document.addEventListener('DOMContentLoaded', () => {
-    // URL se search parameters nikal lo
-    const params = new URLSearchParams(window.location.search);
-    const origin = params.get('origin');
-    const destination = params.get('destination');
-    const date = params.get('date');
-    const type = params.get('type');
+    // URL params read karo
+    const urlParams = new URLSearchParams(window.location.search);
+    const origin = urlParams.get('origin');
+    const destination = urlParams.get('destination');
+    const date = urlParams.get('date');
+    const type = urlParams.get('type') || 'bus';
 
-    // Agar zaruri params missing hain, toh message dikhao
-    if (!origin || !destination) {
+    if (!origin || !destination || !date) {
         document.getElementById('resultsContainer').innerHTML = `
-            <div class="no-results">
-                <h3>No search parameters found</h3>
-                <p>Please return to the homepage and search for a route.</p>
-                <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Back Home</a>
+            <div class="empty-state">
+                <h3>Missing Information</h3>
+                <p>Please go back and enter origin, destination, and date.</p>
+                <a href="index.html" class="btn btn-primary">Go Back</a>
             </div>
         `;
         return;
     }
 
-    // Page ka heading update karo
-    document.getElementById('routeTitle').textContent = `${origin} → ${destination}`;
-
-    // URL param ke hisaab se active filter tab set karo
-    if (type === 'bus') {
-        document.getElementById('filter-bus').checked = true;
-    } else if (type === 'train') {
-        document.getElementById('filter-train').checked = true;
-    } else {
-        document.getElementById('filter-all').checked = true;
-    }
-
-    // Results fetch karna shuru karo
-    fetchResults(origin, destination, type);
-
-    // ── Filter tab change listeners ──
-    // Jab user Bus/Train/All click kare, tab naye filter ke saath API se fetch karo
-    document.querySelectorAll('.results-filter input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            fetchResults(origin, destination, e.target.value);
-
-            // Page refresh kiye bina URL update karo
-            const newUrl = new URL(window.location);
-            if (e.target.value) {
-                newUrl.searchParams.set('type', e.target.value);
-            } else {
-                newUrl.searchParams.delete('type');
-            }
-            window.history.replaceState({}, '', newUrl);
+    // Title update karo
+    const routeTitle = document.getElementById('routeTitle');
+    if (routeTitle) routeTitle.textContent = `${origin} to ${destination}`;
+    
+    // Active tab set karo
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        if(tab.dataset.type === type) tab.classList.add('active');
+        else tab.classList.remove('active');
+        
+        tab.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            fetchResults(origin, destination, e.target.dataset.type, date);
         });
     });
+
+    fetchResults(origin, destination, type, date);
+    fetchWeather(destination);
 });
 
-// Backend API se routes fetch karo
-async function fetchResults(origin, destination, type) {
-    const container = document.getElementById('resultsContainer');
-    const countEl = document.getElementById('resultCount');
-
-    // Loading state dikhao
-    container.innerHTML = '<div class="loading-state">🔍 Finding the best routes...</div>';
+// Results fetch karo API se
+const fetchResults = async (origin, dest, type, date) => {
+    const container = document.getElementById('resultsList');
+    if (!container) return;
+    container.innerHTML = '<div class="loading">Loading routes...</div>';
 
     try {
-        // Query parameters ke saath API URL banao
-        let url = `${API_BASE}/routes/search?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
-        if (type) url += `&type=${type}`;
+        const response = await fetch(`${API_BASE}/routes/search?origin=${origin}&destination=${dest}&type=${type}`);
+        const routes = await response.json();
 
-        const res = await fetch(url);
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message);
-
-        // Result count text update karo
-        countEl.textContent = `${data.count} route${data.count !== 1 ? 's' : ''} found`;
-
-        // Agar koi route nahi mila, toh empty state dikhao
-        if (data.count === 0) {
+        if (routes.length === 0) {
             container.innerHTML = `
-                <div class="no-results">
-                    <h3>No routes found</h3>
-                    <p>Hamein ${origin} se ${destination} tak koi ${type ? type : ''} nahi mili. Kuch aur search karke dekhein.</p>
-                </div>
-            `;
+                <div class="empty-state">
+                    <h3>No Routes Found</h3>
+                    <p>Sorry, we couldn't find any ${type}s from ${origin} to ${dest}.</p>
+                </div>`;
+            document.getElementById('resultCount').textContent = '0';
             return;
         }
 
-        // Route cards render karo
-        renderRouteCards(data.routes);
-
-    } catch (err) {
-        container.innerHTML = `
-            <div class="no-results">
-                <h3 style="color: #ef4444;">Connection Error</h3>
-                <p>${err.message}. Please check if the backend server is running.</p>
-            </div>
-        `;
-        countEl.textContent = 'Error';
+        renderRouteCards(routes, date);
+        document.getElementById('resultCount').textContent = routes.length.toString();
+    } catch (error) {
+        container.innerHTML = `<div class="error-state">Error fetching routes: ${error.message}</div>`;
     }
-}
+};
 
-// API data se route cards ka HTML render karo
-function renderRouteCards(routes) {
-    const container = document.getElementById('resultsContainer');
-    const date = new URLSearchParams(window.location.search).get('date');
+// Route cards render karo
+const renderRouteCards = (routes, date) => {
+    const container = document.getElementById('resultsList');
+    container.innerHTML = '';
 
-    let html = '';
+    // Smart badges ke liye calculations
+    const minPrice = Math.min(...routes.map(r => r.price));
+    const maxRating = Math.max(...routes.map(r => r.rating || 0));
 
-    // Har route ke liye card banao
-    routes.forEach((route, i) => {
-        const delay = `fade-up-d${(i % 6) + 1}`;
-        const badgeClass = route.transport_type === 'bus' ? 'badge-bus' : 'badge-train';
-        const badgeText = route.transport_type.charAt(0).toUpperCase() + route.transport_type.slice(1);
+    routes.forEach(route => {
+        let badgesHTML = '';
+        if (route.price === minPrice) badgesHTML += `<span class="badge badge-success">Best Price</span> `;
+        if (route.rating === maxRating && maxRating > 0) badgesHTML += `<span class="badge badge-warning">Most Popular</span>`;
 
-        html += `
-        <div class="route-card fade-up ${delay}">
-            <div class="route-operator">
-                <h3>${route.operator_name} <span class="badge ${badgeClass}">${badgeText}</span></h3>
-                <span class="route-vehicle">${route.vehicle_type}</span>
-            </div>
-            <div class="route-journey">
-                <div class="route-point">
-                    <div class="route-time">${route.departure_time}</div>
-                    <div class="route-city">${route.origin}</div>
+        const card = document.createElement('div');
+        card.className = 'route-card';
+        card.innerHTML = `
+            <div class="route-header">
+                <div class="operator-info">
+                    <h3>${route.operator}</h3>
+                    <span class="vehicle-type">${route.vehicleType}</span>
                 </div>
-                <div class="route-connector">
-                    <div class="route-duration">${route.duration}</div>
-                    <div class="route-line"></div>
+                <div class="badges">${badgesHTML}</div>
+            </div>
+            
+            <div class="route-body">
+                <div class="time-location">
+                    <div class="time">${route.departureTime}</div>
+                    <div class="location">${route.origin}</div>
                 </div>
-                <div class="route-point">
-                    <div class="route-time">${route.arrival_time}</div>
-                    <div class="route-city">${route.destination}</div>
+                
+                <div class="duration-connector">
+                    <span class="duration">${route.duration}</span>
+                    <div class="line"></div>
+                </div>
+                
+                <div class="time-location text-right">
+                    <div class="time">${route.arrivalTime}</div>
+                    <div class="location">${route.destination}</div>
                 </div>
             </div>
-            <div class="route-action">
-                <div class="ticket-price">₹${route.price}</div>
-                <button class="btn-book" onclick="window.location.href='seat-selection.html?routeId=${route.id}&date=${date}'">Book Now</button>
+            
+            <div class="route-footer">
+                <div class="rating-price">
+                    ${route.rating ? `<div class="rating"><i class="fas fa-star"></i> ${route.rating}</div>` : ''}
+                    <div class="price">₹${route.price}</div>
+                </div>
+                <a href="seat-selection.html?routeId=${route._id}&date=${date}" class="btn btn-primary">Book Now</a>
             </div>
-        </div>
         `;
+        container.appendChild(card);
     });
+};
 
-    container.innerHTML = html;
-}
+// Weather fetch karo
+const fetchWeather = async (city) => {
+    const weatherWidget = document.getElementById('weatherWidget');
+    if (!weatherWidget) return;
+    
+    try {
+        const response = await fetch(`https://wttr.in/${city}?format=j1`);
+        const data = await response.json();
+        const current = data.current_condition[0];
+        
+        weatherWidget.innerHTML = `
+            <div class="weather-info">
+                <span class="temp">${current.temp_C}°C</span>
+                <span class="condition">${current.weatherDesc[0].value} in ${city}</span>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Weather fetch error:', error);
+        weatherWidget.style.display = 'none';
+    }
+};

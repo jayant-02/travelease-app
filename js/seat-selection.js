@@ -1,163 +1,169 @@
-/*
-  seat-selection.js — Seat Selection & Booking Logic
-  This script runs on seat-selection.html.
-  FLOW:
-  1. Read routeId and date from URL parameters
-  2. Fetch route details from the backend API
-  3. Populate the trip info panel with real data
-  4. Randomly mark some seats as "taken" (for demo purposes)
-  5. Track seat selection and update the total price
-  6. On "Proceed to Pay", call the booking API
-  7. If user is not logged in, show auth modal first
-*/
+let currentRoute = null;
+let selectedSeats = [];
+const MAX_SEATS = 6;
+let routeDate = '';
 
-// URL se details nikalo
-const urlParams = new URLSearchParams(window.location.search);
-const routeId = urlParams.get('routeId');
-const travelDate = urlParams.get('date');
+document.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const routeId = urlParams.get('routeId');
+    routeDate = urlParams.get('date');
 
-let routeData = null;
-
-document.addEventListener('DOMContentLoaded', () => {
     if (!routeId) {
-        document.querySelector('.seat-wrapper').innerHTML = `
-            <div class="no-results" style="width:100%; text-align:center;">
-                <h3>Missing Information</h3>
-                <p>Please go back and select a route from the search results.</p>
-                <a href="index.html" class="btn-book" style="display:inline-block;margin-top:16px;">← Go Home</a>
-            </div>
-        `;
+        window.location.href = 'index.html';
         return;
     }
-    fetchRouteDetails();
+
+    try {
+        const response = await fetch(`${API_BASE}/routes/${routeId}`);
+        currentRoute = await response.json();
+        
+        populateRouteInfo();
+        generateSeatGrid();
+    } catch (error) {
+        console.error('Error loading route:', error);
+    }
 });
 
-// Backend se is route ki detail le aao
-async function fetchRouteDetails() {
-    try {
-        const res = await fetch(`${API_BASE}/routes/${routeId}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-        
-        routeData = data;
-        
-        // Populate the left panel with route details
-        document.getElementById('opName').textContent = routeData.operator_name;
+// Route info panel bharna
+const populateRouteInfo = () => {
+    document.getElementById('routeTitle').textContent = `${currentRoute.origin} to ${currentRoute.destination}`;
+    document.getElementById('operatorName').textContent = currentRoute.operator;
+    document.getElementById('vehicleType').textContent = currentRoute.vehicleType;
+    document.getElementById('depTime').textContent = currentRoute.departureTime;
+    document.getElementById('arrTime').textContent = currentRoute.arrivalTime;
+    document.getElementById('travelDate').textContent = routeDate;
+};
 
-        const badge = document.getElementById('transportBadge');
-        badge.textContent = routeData.transport_type.charAt(0).toUpperCase() + routeData.transport_type.slice(1);
-        badge.className = `badge ${routeData.transport_type === 'bus' ? 'badge-bus' : 'badge-train'}`;
-
-        document.getElementById('tripOrigin').textContent = routeData.origin;
-        document.getElementById('tripDest').textContent = routeData.destination;
-        document.getElementById('tripDepTime').textContent = routeData.departure_time;
-        document.getElementById('tripArrTime').textContent = routeData.arrival_time;
-
-        document.getElementById('detailDuration').textContent = routeData.duration;
-        document.getElementById('detailPrice').textContent = `₹${routeData.price}`;
-        document.getElementById('detailVehicle').textContent = routeData.vehicle_type;
-
-        // Simulate some seats being already taken
-        markTakenSeats(parseInt(routeId));
-        attachSeatListeners();
-    } catch (err) {
-        document.querySelector('.seat-wrapper').innerHTML = `
-            <div class="no-results" style="width:100%; text-align:center;">
-                <h3 style="color:#ef4444;">Error</h3>
-                <p>${err.message}. Make sure the backend server is running.</p>
-            </div>
-        `;
+// Seat grid banano based on route type
+const generateSeatGrid = () => {
+    const container = document.getElementById('seatGrid');
+    container.innerHTML = '';
+    
+    const isTrain = currentRoute.totalSeats > 52;
+    const total = currentRoute.totalSeats;
+    
+    // Dummy randomly taken seats (~20%)
+    const takenSeats = new Set();
+    while(takenSeats.size < Math.floor(total * 0.2)) {
+        takenSeats.add(Math.floor(Math.random() * total) + 1);
     }
-}
 
-// Mark some seats as "taken" based on route ID
-function markTakenSeats(routeId) {
-    const seed = routeId * 7 + 3;
-    document.querySelectorAll('.seat-cb').forEach((cb, index) => {
-        // Simple pseudo-random pattern based on seat index and route ID
-        if ((index * seed) % 11 === 0 || (index * seed + 5) % 13 === 0) {
-            cb.disabled = true;
-            cb.nextElementSibling.classList.add('taken');
+    if (!isTrain) {
+        // Bus layout: 2+2
+        container.classList.add('bus-layout');
+        let rowHtml = '';
+        for (let i = 1; i <= total; i++) {
+            const isTaken = takenSeats.has(i);
+            const seatClass = isTaken ? 'seat taken' : 'seat available';
+            
+            rowHtml += `<div class="${seatClass}" data-seat="${i}" ${isTaken ? '' : `onclick="toggleSeat(${i})"`}>${i}</div>`;
+            
+            if (i % 2 === 0 && i % 4 !== 0) {
+                rowHtml += `<div class="aisle"></div>`; // Aisle gap
+            }
+            
+            if (i % 4 === 0) {
+                container.innerHTML += `<div class="seat-row">${rowHtml}</div>`;
+                rowHtml = '';
+            }
         }
-    });
-}
+        if (rowHtml) container.innerHTML += `<div class="seat-row">${rowHtml}</div>`;
+    } else {
+        // Train layout: row of 6
+        container.classList.add('train-layout');
+        let rowHtml = '';
+        for (let i = 1; i <= total; i++) {
+            const isTaken = takenSeats.has(i);
+            const seatClass = isTaken ? 'seat taken' : 'seat available';
+            
+            rowHtml += `<div class="${seatClass}" data-seat="${i}" ${isTaken ? '' : `onclick="toggleSeat(${i})"`}>${i}</div>`;
+            
+            if (i % 6 === 0) {
+                container.innerHTML += `<div class="seat-row">${rowHtml}</div>`;
+                rowHtml = '';
+            }
+        }
+        if (rowHtml) container.innerHTML += `<div class="seat-row">${rowHtml}</div>`;
+    }
+};
 
-// Seat select/deselect par summary update karo
-function attachSeatListeners() {
-    const checkboxes = document.querySelectorAll('.seat-cb');
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', updateSummary);
-    });
-}
+// Seat select/deselect logic
+window.toggleSeat = (seatNum) => {
+    const seatEl = document.querySelector(`.seat[data-seat="${seatNum}"]`);
+    
+    if (selectedSeats.includes(seatNum)) {
+        selectedSeats = selectedSeats.filter(s => s !== seatNum);
+        seatEl.classList.remove('selected');
+        seatEl.classList.add('available');
+    } else {
+        if (selectedSeats.length >= MAX_SEATS) {
+            alert(`You can only select up to ${MAX_SEATS} seats.`);
+            return;
+        }
+        selectedSeats.push(seatNum);
+        seatEl.classList.remove('available');
+        seatEl.classList.add('selected');
+    }
+    
+    updateSummary();
+};
 
-function updateSummary() {
-    const selected = document.querySelectorAll('.seat-cb:checked:not(:disabled)');
-    const count = selected.length;
-    const total = count * routeData.price;
-    
-    document.getElementById('selectedSeats').textContent = count > 0 ? count : '—';
-    document.getElementById('totalPrice').textContent = `₹${total}`;
-    
+// Summary aur price update karo
+const updateSummary = () => {
+    const seatListEl = document.getElementById('selectedSeatList');
+    const totalEl = document.getElementById('totalPrice');
     const proceedBtn = document.getElementById('proceedBtn');
-    if (proceedBtn) proceedBtn.disabled = count === 0;
-}
-
-// Jab user Confirm Booking dabaye
-document.getElementById('proceedBtn').addEventListener('click', () => {
-    const selected = document.querySelectorAll('.seat-cb:checked:not(:disabled)');
     
-    // Login nahi kiya hai toh modal kholo aur process rok do
-    if (!getToken()) {
+    if (selectedSeats.length === 0) {
+        seatListEl.textContent = 'None';
+        totalEl.textContent = '₹0';
+        proceedBtn.disabled = true;
+    } else {
+        seatListEl.textContent = selectedSeats.join(', ');
+        totalEl.textContent = `₹${selectedSeats.length * currentRoute.price}`;
+        proceedBtn.disabled = false;
+    }
+};
+
+// Booking confirm karo
+window.confirmBooking = async () => {
+    if (!currentUser) {
+        // User logged in nahi hai toh auth modal dikhao
+        window.onAuthSuccess = () => confirmBooking();
         openAuthModal();
         return;
     }
 
-    // Login hai toh aage badho
-    processBooking(selected.length);
-});
-
-// Login success hone pe apne aap booking start kardo
-window.onAuthSuccess = function () {
-    const selected = document.querySelectorAll('.seat-cb:checked:not(:disabled)');
-    if (selected.length > 0) {
-        processBooking(selected.length);
-    }
-};
-
-// Booking request bhejo
-async function processBooking(seatCount) {
-    const btn = document.getElementById('proceedBtn');
-    const originalText = btn.textContent;
-    btn.textContent = 'Processing...';
-    btn.disabled = true;
-
     try {
-        const payload = {
-            route_id: routeData.id,
-            travel_date: travelDate,
-            seats: seatCount
-        };
-
-        const res = await fetch(`${API_BASE}/bookings`, {
+        const response = await fetch(`${API_BASE}/bookings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${getToken()}`
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                routeId: currentRoute._id,
+                travelDate: routeDate,
+                seats: selectedSeats.length
+            })
         });
 
-        const data = await res.json();
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
 
-        if (!res.ok) throw new Error(data.message);
-
-        // Booking successful! My Bookings page pe le jao
-        alert('🎉 ' + data.message);
-        window.location.href = 'bookings.html';
-        
-    } catch (err) {
-        alert('Booking failed: ' + err.message);
-        btn.textContent = originalText;
-        btn.disabled = false;
+        // Success message and Cab CTA
+        document.getElementById('bookingPanel').innerHTML = `
+            <div class="success-message text-center">
+                <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                <h3>Booking Confirmed!</h3>
+                <p>Your tickets have been booked successfully.</p>
+                <div class="mt-4">
+                    <a href="bookings.html" class="btn btn-outline">View Tickets</a>
+                    <a href="cab-booking.html?pickup=${currentRoute.destination}&bookingId=${data._id}" class="btn btn-primary mt-2">Book a Cab from Station</a>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        alert(`Booking failed: ${error.message}`);
     }
-}
+};

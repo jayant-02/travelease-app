@@ -1,0 +1,151 @@
+/* 
+ * Cab Booking CSS
+ */
+
+.cab-page {
+  padding-top: 100px;
+  padding-bottom: 60px;
+}
+
+.cab-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.cab-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.cab-form {
+  background: #FFFFFF;
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 32px;
+  border: 1px solid var(--border);
+}
+
+.location-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+/* Connector line between pickup and dropoff */
+.location-inputs::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: var(--border);
+  border-left: 2px dashed var(--border);
+  z-index: 1;
+}
+
+.cab-types {
+  margin-bottom: 32px;
+}
+
+.cab-types-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+}
+
+.cab-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.cab-type-card {
+  border: 2px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cab-type-card:hover {
+  border-color: var(--primary-light);
+  background: #F0F9FF;
+}
+
+.cab-type-card.active {
+  border-color: var(--primary);
+  background: #F0F9FF;
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.cab-icon {
+  font-size: 2rem;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.cab-type-name {
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.cab-type-price {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.fare-estimate {
+  background: var(--bg);
+  border-radius: var(--r-md);
+  padding: 20px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+
+.fare-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--text-body);
+  font-size: 0.95rem;
+}
+
+.fare-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.btn-confirm-cab {
+  background: var(--accent);
+  color: var(--text-dark);
+  font-weight: 700;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-md);
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.btn-confirm-cab:hover {
+  background: var(--accent-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 600px) {
+  .cab-type-grid {
+    grid-template-columns: 1fr;
+  }
+}

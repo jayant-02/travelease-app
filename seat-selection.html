@@ -1,201 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TravelEase — Select Your Seats</title>
-    <meta name="description" content="Choose your preferred seats and book your ticket.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Seats - TravelEase</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/seat-selection.css">
 </head>
 <body>
 
-    <!-- Navbar (Andar ke pages mein solid rahega) -->
-    <nav class="navbar solid">
-        <div class="navbar-inner">
-            <a href="index.html" class="nav-logo"><div class="logo-bubble">✦</div> TravelEase</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="index.html#how-it-works">How It Works</a></li>
-                <li><a href="index.html#footer">Contact</a></li>
-            </ul>
-            <div style="display:flex;align-items:center;gap:12px;">
-                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
-                <div class="nav-actions" id="navActions"></div>
-            </div>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="images/logo.png" alt="TravelEase" style="height:32px;width:32px;border-radius:8px;object-fit:cover;"> TravelEase
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="index.html#how-it-works"><i class="fas fa-info-circle"></i> How It Works</a></li>
+        <li><a href="#footer"><i class="fas fa-envelope"></i> Contact</a></li>
+      </ul>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+        <div class="nav-actions" id="navActions">
+          <button class="btn-nav" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
         </div>
-    </nav>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Asli Content -->
-    <main class="page-inner">
+  <!-- Seat wrapper 2-column grid layout -->
+  <div class="seat-wrapper">
+    <!-- Left panel -->
+    <div class="seat-info">
+      <h2 id="seatRouteTitle">Seat Selection</h2>
+      <div class="trip-route-bar" id="tripRouteBar">
+        Origin <i class="fas fa-arrow-right"></i> Destination
+      </div>
+      
+      <div class="detail-rows">
+        <p><strong>Operator:</strong> <span id="operatorVal">-</span></p>
+        <p><strong>Vehicle:</strong> <span id="vehicleVal">-</span></p>
+        <p><strong>Departure:</strong> <span id="departureVal">-</span></p>
+        <p><strong>Duration:</strong> <span id="durationVal">-</span></p>
+        <p><strong>Date:</strong> <span id="dateVal">-</span></p>
+      </div>
+      
+      <!-- Seat legend -->
+      <div class="seat-legend">
+        <div class="legend-item"><span class="box available"></span> Available</div>
+        <div class="legend-item"><span class="box selected"></span> Selected</div>
+        <div class="legend-item"><span class="box taken"></span> Taken</div>
+      </div>
+      
+      <div class="selected-seats-display">
+        <strong>Seats Selected:</strong> <span id="selectedSeatsText">None</span>
+      </div>
+      
+      <div class="price-breakdown">
+        <p>Price per seat: <span id="pricePerSeat">₹0</span></p>
+        <p>Total Amount: <span id="totalAmount">₹0</span></p>
+      </div>
+      
+      <button class="btn-proceed" id="btnConfirmBooking">Confirm Booking</button>
+      
+      <!-- CTA to cab booking after confirm, pehle hide rakhenge -->
+      <div id="cabBookingCta" style="display:none; margin-top:20px; text-align:center;">
+        <p>Need a ride from destination?</p>
+        <a href="cab-booking.html" class="btn-nav">Book a Cab?</a>
+      </div>
+    </div>
+    
+    <!-- Right panel for map -->
+    <div class="seat-map-panel">
+      <h3>Select Your Seats</h3>
+      <div class="bus-front-indicator"><i class="fas fa-steering-wheel"></i> &larr; Front of Vehicle</div>
+      
+      <!-- Seat Grid (5 columns via CSS) -->
+      <div class="seat-grid" id="seatGrid">
+        <!-- JS dynamically checkboxes aur labels add karega yahan -->
+      </div>
+      
+      <div class="seat-map-footer">
+        <p>You can select up to 6 seats.</p>
+      </div>
+    </div>
+  </div>
 
-        <!-- Wapas Results par jaane wala link -->
-        <div class="container" style="padding-top:24px;">
-            <a href="results.html" class="btn-back" id="backBtn">← Back to Results</a>
-        </div>
+  <!-- Footer block -->
+  <footer id="footer" class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>TravelEase</h3>
+        <p>India's Smartest Travel Platform</p>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 TravelEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-        <!-- 2 Column layout: Left mein Trip details, Right mein Seat Map -->
-        <div class="seat-wrapper">
-
-            <!-- Left Column: Trip ki jaankari -->
-            <div class="seat-info">
-
-                <h2 id="opName">Loading...</h2>
-                <span class="badge" id="transportBadge">—</span>
-
-                <!-- Route bar jisme location, time hoga -->
-                <div class="trip-route-bar">
-                    <div class="trip-point">
-                        <div class="trip-label">Departure</div>
-                        <div class="trip-city" id="tripOrigin">—</div>
-                        <div class="trip-time" id="tripDepTime">—</div>
-                    </div>
-                    <div class="trip-arrow">→</div>
-                    <div class="trip-point" style="text-align:right;">
-                        <div class="trip-label">Arrival</div>
-                        <div class="trip-city" id="tripDest">—</div>
-                        <div class="trip-time" id="tripArrTime">—</div>
-                    </div>
-                </div>
-
-                <!-- Baaki details: Duration, Price, Vehicle Type -->
-                <div class="detail-row">
-                    <span class="dl">Duration</span>
-                    <span class="dv" id="detailDuration">—</span>
-                </div>
-                <div class="detail-row">
-                    <span class="dl">Price per seat</span>
-                    <span class="dv" style="color:var(--green)" id="detailPrice">—</span>
-                </div>
-                <div class="detail-row">
-                    <span class="dl">Vehicle</span>
-                    <span class="dv" id="detailVehicle">—</span>
-                </div>
-
-                <!-- Seat legend -->
-                <div class="seat-legend">
-                    <div class="legend-item"><div class="legend-swatch avail"></div><span>Available</span></div>
-                    <div class="legend-item"><div class="legend-swatch sel"></div><span>Selected</span></div>
-                    <div class="legend-item"><div class="legend-swatch taken"></div><span>Taken</span></div>
-                </div>
-
-                <!-- Booking ki summary aur total calculation -->
-                <div class="detail-row" style="margin-top:8px;">
-                    <span class="dl">Selected Seats</span>
-                    <span class="dv" id="selectedSeats">—</span>
-                </div>
-                <div class="detail-row total">
-                    <span class="dl">Total Amount</span>
-                    <span class="dv" id="totalPrice">₹0</span>
-                </div>
-
-                <button class="btn-proceed" id="proceedBtn" onclick="handleProceed()">Proceed to Pay</button>
-
-            </div>
-
-            <!-- Right Column: Bus ya Train ka Seat Map -->
-            <div class="seat-map-panel">
-                <h3>Choose Your Seats</h3>
-                <div class="bus-front-indicator">🚍 Front of Bus</div>
-
-                <!-- 40-seat grid: 10 rows × 4 seats (beech mein rasta) -->
-                <div class="seat-grid">
-                    <!-- Row 1 -->
-                    <input type="checkbox" id="s1" class="seat-cb"><label for="s1" class="seat">1</label>
-                    <input type="checkbox" id="s2" class="seat-cb"><label for="s2" class="seat">2</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s3" class="seat-cb"><label for="s3" class="seat">3</label>
-                    <input type="checkbox" id="s4" class="seat-cb"><label for="s4" class="seat">4</label>
-
-                    <!-- Row 2 -->
-                    <input type="checkbox" id="s5" class="seat-cb"><label for="s5" class="seat">5</label>
-                    <input type="checkbox" id="s6" class="seat-cb"><label for="s6" class="seat">6</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s7" class="seat-cb"><label for="s7" class="seat">7</label>
-                    <input type="checkbox" id="s8" class="seat-cb"><label for="s8" class="seat">8</label>
-
-                    <!-- Row 3 -->
-                    <input type="checkbox" id="s9" class="seat-cb"><label for="s9" class="seat">9</label>
-                    <input type="checkbox" id="s10" class="seat-cb"><label for="s10" class="seat">10</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s11" class="seat-cb"><label for="s11" class="seat">11</label>
-                    <input type="checkbox" id="s12" class="seat-cb"><label for="s12" class="seat">12</label>
-
-                    <!-- Row 4 -->
-                    <input type="checkbox" id="s13" class="seat-cb"><label for="s13" class="seat">13</label>
-                    <input type="checkbox" id="s14" class="seat-cb"><label for="s14" class="seat">14</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s15" class="seat-cb"><label for="s15" class="seat">15</label>
-                    <input type="checkbox" id="s16" class="seat-cb"><label for="s16" class="seat">16</label>
-
-                    <!-- Row 5 -->
-                    <input type="checkbox" id="s17" class="seat-cb"><label for="s17" class="seat">17</label>
-                    <input type="checkbox" id="s18" class="seat-cb"><label for="s18" class="seat">18</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s19" class="seat-cb"><label for="s19" class="seat">19</label>
-                    <input type="checkbox" id="s20" class="seat-cb"><label for="s20" class="seat">20</label>
-
-                    <!-- Row 6 -->
-                    <input type="checkbox" id="s21" class="seat-cb"><label for="s21" class="seat">21</label>
-                    <input type="checkbox" id="s22" class="seat-cb"><label for="s22" class="seat">22</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s23" class="seat-cb"><label for="s23" class="seat">23</label>
-                    <input type="checkbox" id="s24" class="seat-cb"><label for="s24" class="seat">24</label>
-
-                    <!-- Row 7 -->
-                    <input type="checkbox" id="s25" class="seat-cb"><label for="s25" class="seat">25</label>
-                    <input type="checkbox" id="s26" class="seat-cb"><label for="s26" class="seat">26</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s27" class="seat-cb"><label for="s27" class="seat">27</label>
-                    <input type="checkbox" id="s28" class="seat-cb"><label for="s28" class="seat">28</label>
-
-                    <!-- Row 8 -->
-                    <input type="checkbox" id="s29" class="seat-cb"><label for="s29" class="seat">29</label>
-                    <input type="checkbox" id="s30" class="seat-cb"><label for="s30" class="seat">30</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s31" class="seat-cb"><label for="s31" class="seat">31</label>
-                    <input type="checkbox" id="s32" class="seat-cb"><label for="s32" class="seat">32</label>
-
-                    <!-- Row 9 -->
-                    <input type="checkbox" id="s33" class="seat-cb"><label for="s33" class="seat">33</label>
-                    <input type="checkbox" id="s34" class="seat-cb"><label for="s34" class="seat">34</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s35" class="seat-cb"><label for="s35" class="seat">35</label>
-                    <input type="checkbox" id="s36" class="seat-cb"><label for="s36" class="seat">36</label>
-
-                    <!-- Row 10 -->
-                    <input type="checkbox" id="s37" class="seat-cb"><label for="s37" class="seat">37</label>
-                    <input type="checkbox" id="s38" class="seat-cb"><label for="s38" class="seat">38</label>
-                    <div class="aisle"></div>
-                    <input type="checkbox" id="s39" class="seat-cb"><label for="s39" class="seat">39</label>
-                    <input type="checkbox" id="s40" class="seat-cb"><label for="s40" class="seat">40</label>
-                </div>
-
-                <div class="seat-map-footer">Click on available seats to select them</div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Niche wala Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="nav-logo"><div class="logo-bubble">✦</div> TravelEase</div>
-                    <p>Making bus and train travel simple, affordable, and enjoyable.</p>
-                </div>
-                <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div>
-                <div class="footer-col"><h4>Support</h4><a href="#">Help Centre</a><a href="#">Contact Us</a><a href="#">FAQs</a></div>
-                <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Refund Policy</a></div>
-            </div>
-            <div class="footer-bottom">© 2026 TravelEase. All rights reserved.</div>
-        </div>
-    </footer>
-
-    <script src="js/main.js"></script>
-    <script src="js/seat-selection.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/seat-selection.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080/api';
+  </script>
 </body>
 </html>
