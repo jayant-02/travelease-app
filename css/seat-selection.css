@@ -46,7 +46,7 @@
 
 /* Info Panel */
 .seat-info {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-xl);
   border: 1px solid var(--border);
   padding: 24px;
@@ -105,7 +105,7 @@
 
 /* Seat Map Panel */
 .seat-map-panel {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-xl);
   border: 1px solid var(--border);
   padding: 32px;

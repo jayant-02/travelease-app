@@ -18,7 +18,7 @@
 }
 
 .cab-form {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-lg);
   padding: 32px;

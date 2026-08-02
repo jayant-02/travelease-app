@@ -21,7 +21,7 @@
 }
 
 .stat-card {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-lg);
   border: 1px solid var(--border);
   padding: 24px;
@@ -61,7 +61,7 @@
 }
 
 .booking-card {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-lg);
   border: 1px solid var(--border);
   border-left: 4px solid var(--primary);

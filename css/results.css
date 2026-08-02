@@ -13,7 +13,7 @@ body {
 
 /* Results Header */
 .results-header {
-  background: #FFFFFF;
+  background: var(--card);
   border-bottom: 1px solid var(--border);
   padding: 24px;
 }
@@ -89,7 +89,7 @@ body {
 }
 
 .weather-widget {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-lg);
   border: 1px solid var(--border);
   padding: 20px;
@@ -116,7 +116,7 @@ body {
 
 /* Filter Tabs */
 .results-filter {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-lg);
   border: 1px solid var(--border);
   padding: 20px;
@@ -159,7 +159,7 @@ body {
 
 /* Route Cards */
 .route-card {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: var(--r-lg);
   border: 1px solid var(--border);
   border-left: 4px solid var(--primary);
@@ -271,7 +271,7 @@ body {
 .duration {
   font-size: 0.8rem;
   color: var(--text-muted);
-  background: #FFFFFF;
+  background: var(--card);
   padding: 0 8px;
   position: relative;
   z-index: 2;
@@ -320,7 +320,7 @@ body {
 
 /* Empty State */
 .empty-state {
-  background: #FFFFFF;
+  background: var(--card);
   border: 2px dashed var(--border);
   border-radius: var(--r-lg);
   padding: 60px 24px;

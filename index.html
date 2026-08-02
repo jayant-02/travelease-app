@@ -27,14 +27,15 @@
         <img src="images/logo.png" alt="TravelEase" style="height:32px;width:32px;border-radius:8px;object-fit:cover;"> TravelEase
       </a>
       <ul class="nav-menu" id="navMenu">
-        <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="#how-it-works"><i class="fas fa-info-circle"></i> How It Works</a></li>
-        <li><a href="#footer"><i class="fas fa-envelope"></i> Contact</a></li>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="results.html">Routes</a></li>
+        <li><a href="#footer">Contact</a></li>
       </ul>
       <div style="display:flex;align-items:center;gap:12px;">
         <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
         <div class="nav-actions" id="navActions">
-          <button class="btn-nav" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+          <button class="btn-nav" onclick="openAuthModal()">Sign In</button>
         </div>
       </div>
     </div>
@@ -44,61 +45,102 @@
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-text">
-        <span class="tag-pill">✈ India's Smartest Travel Platform</span>
+        <span class="tag-pill">✦ India's Smartest Travel Platform</span>
         <h1>Travel made<br><span>effortless.</span></h1>
-        <p>Book your bus and train tickets in just a few clicks. Best prices guaranteed.</p>
+        <p>Compare buses and trains across hundreds of routes. Find the best fares and book your seat in seconds.</p>
       </div>
       
       <!-- Search Card form -->
       <div class="search-card">
         <div class="transport-tabs">
-          <label><input type="radio" name="transport" value="All" checked> All</label>
-          <label><input type="radio" name="transport" value="Bus"> Bus</label>
-          <label><input type="radio" name="transport" value="Train"> Train</label>
+          <input type="radio" id="tab-all" name="transport" value="All" checked>
+          <label for="tab-all">All</label>
+          <input type="radio" id="tab-bus" name="transport" value="Bus">
+          <label for="tab-bus"><i class="fas fa-bus"></i> Bus</label>
+          <input type="radio" id="tab-train" name="transport" value="Train">
+          <label for="tab-train"><i class="fas fa-train"></i> Train</label>
         </div>
         
         <form class="search-form" id="searchForm">
-          <div class="autocomplete-wrapper">
-            <input type="text" id="fromInput" placeholder="Leaving from..." required autocomplete="off">
-            <ul class="autocomplete-list" id="fromList"></ul>
+          <div class="form-field">
+            <label for="fromInput">From</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="fromInput" placeholder="e.g. Indore" required autocomplete="off">
+              <ul class="autocomplete-list" id="fromList"></ul>
+            </div>
           </div>
           
-          <div class="autocomplete-wrapper">
-            <input type="text" id="toInput" placeholder="Going to..." required autocomplete="off">
-            <ul class="autocomplete-list" id="toList"></ul>
+          <div class="form-field">
+            <label for="toInput">To</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="toInput" placeholder="e.g. Bhopal" required autocomplete="off">
+              <ul class="autocomplete-list" id="toList"></ul>
+            </div>
           </div>
           
-          <div class="custom-datepicker">
-            <input type="date" id="dateInput" required>
+          <div class="form-field">
+            <label>Date</label>
+            <div class="custom-datepicker" id="customDatePicker">
+              <div class="calendar-input" id="cdpInput">
+                <span id="calendarDateText">dd-mm-yyyy</span>
+                <i class="far fa-calendar-alt calendar-icon" style="margin-left: auto; opacity: 0.7;"></i>
+                <input type="hidden" name="date" id="dateInput" required>
+              </div>
+              <div class="calendar-dropdown" id="cdpDropdown">
+                <div class="calendar-header">
+                  <button type="button" id="calendarPrev"><i class="fas fa-chevron-left"></i></button>
+                  <div class="calendar-month-year" id="cdpMonthYear"></div>
+                  <button type="button" id="calendarNext"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid">
+                  <div class="calendar-day-name">Su</div>
+                  <div class="calendar-day-name">Mo</div>
+                  <div class="calendar-day-name">Tu</div>
+                  <div class="calendar-day-name">We</div>
+                  <div class="calendar-day-name">Th</div>
+                  <div class="calendar-day-name">Fr</div>
+                  <div class="calendar-day-name">Sa</div>
+                </div>
+                <div class="calendar-grid" id="cdpDays"></div>
+              </div>
+            </div>
           </div>
           
-          <button type="button" class="btn-search" onclick="handleSearch()"><i class="fas fa-search"></i> Search</button>
+          <button type="button" class="btn-search" onclick="handleSearch()">Search <i class="fas fa-arrow-right"></i></button>
         </form>
       </div>
-    </div>
-  </section>
 
-  <!-- Features Strip for benefits -->
-  <section class="features-strip">
-    <div class="feature-box">
-      <i class="fas fa-tags"></i>
-      <h4>Best Prices</h4>
-      <p>Compare fares instantly</p>
-    </div>
-    <div class="feature-box">
-      <i class="fas fa-bolt"></i>
-      <h4>Easy Booking</h4>
-      <p>Book in under a minute</p>
-    </div>
-    <div class="feature-box">
-      <i class="fas fa-chair"></i>
-      <h4>Choose Your Seat</h4>
-      <p>Pick exactly where you sit</p>
-    </div>
-    <div class="feature-box">
-      <i class="fas fa-headset"></i>
-      <h4>24/7 Support</h4>
-      <p>We're always here for you</p>
+      <!-- Features Strip inside Hero for transparent layout overlay -->
+      <div class="hero-features">
+        <div class="hero-feature-box">
+          <div class="feature-icon-circle"><i class="fas fa-tags"></i></div>
+          <div class="feature-text">
+            <h4>Best Prices</h4>
+            <p>Save more</p>
+          </div>
+        </div>
+        <div class="hero-feature-box">
+          <div class="feature-icon-circle"><i class="fas fa-bolt"></i></div>
+          <div class="feature-text">
+            <h4>Easy Booking</h4>
+            <p>Book in minutes</p>
+          </div>
+        </div>
+        <div class="hero-feature-box">
+          <div class="feature-icon-circle"><i class="fas fa-shield-alt"></i></div>
+          <div class="feature-text">
+            <h4>Secure Payments</h4>
+            <p>100% safe</p>
+          </div>
+        </div>
+        <div class="hero-feature-box">
+          <div class="feature-icon-circle"><i class="fas fa-headset"></i></div>
+          <div class="feature-text">
+            <h4>24/7 Support</h4>
+            <p>Always here</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -234,16 +276,61 @@
       }
     }
 
-    // Autocomplete fetch example
+    // Autocomplete functional implementation
     async function setupAutocomplete() {
       try {
-        // API call to fetch cities
         const response = await fetch(`${API_BASE}/routes/cities`);
-        if(response.ok) {
-          const cities = await response.json();
-          // Logic for applying cities to autocomplete
-          console.log("Cities loaded:", cities);
-        }
+        if (!response.ok) return;
+        const cities = await response.json();
+        
+        const setupInput = (inputId, listId) => {
+          const input = document.getElementById(inputId);
+          const list = document.getElementById(listId);
+          if (!input || !list) return;
+
+          input.addEventListener('input', () => {
+            const val = input.value.trim().toLowerCase();
+            list.innerHTML = '';
+            if (!val) {
+              list.classList.remove('active');
+              return;
+            }
+
+            const matches = cities.filter(c => c.toLowerCase().includes(val));
+            if (matches.length === 0) {
+              list.classList.remove('active');
+              return;
+            }
+
+            matches.forEach(city => {
+              const li = document.createElement('li');
+              li.className = 'autocomplete-item';
+              
+              // Highlight matched letters
+              const startIdx = city.toLowerCase().indexOf(val);
+              const matchedPart = city.substring(startIdx, startIdx + val.length);
+              li.innerHTML = city.replace(new RegExp(matchedPart, 'i'), `<strong>${matchedPart}</strong>`);
+
+              li.addEventListener('click', () => {
+                input.value = city;
+                list.classList.remove('active');
+              });
+              list.appendChild(li);
+            });
+            list.classList.add('active');
+          });
+
+          // Close on clicking outside
+          document.addEventListener('click', (e) => {
+            if (e.target !== input && !list.contains(e.target)) {
+              list.classList.remove('active');
+            }
+          });
+        };
+
+        setupInput('fromInput', 'fromList');
+        setupInput('toInput', 'toList');
+
       } catch (err) {
         console.error("Cities load nahi ho payi:", err);
       }

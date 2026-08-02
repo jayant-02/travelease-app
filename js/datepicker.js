@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const calendarPrev = document.getElementById('calendarPrev');
     const calendarNext = document.getElementById('calendarNext');
     const calendarDateText = document.getElementById('calendarDateText');
-    const hiddenDateInput = document.getElementById('date');
+    const hiddenDateInput = document.getElementById('dateInput');
 
     let currentDate = new Date();
     let selectedDate = new Date();
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Khali cells start of month ke liye
         for (let i = 0; i < firstDay; i++) {
-            cdpDays.innerHTML += `<div></div>`;
+            cdpDays.innerHTML += `<div class="calendar-day empty"></div>`;
         }
 
         // Days render karo
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isSelected = selectedDate && dateObj.getTime() === selectedDate.getTime();
             
             const dayDiv = document.createElement('div');
-            dayDiv.className = `cdp-day ${isPast ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`;
+            dayDiv.className = `calendar-day ${isPast ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`;
             dayDiv.textContent = i;
             
             if (!isPast) {
